@@ -1,0 +1,23 @@
+---
+list_yum_pkg:
+    - gcc
+    - libselinux-python
+    - kernel-devel
+    - python-httplib2
+    - python-devel
+    - python-pip
+    - ntp
+    - git
+#    - apache-maven
+    - rpm-build
+#    - nc
+#    - lsof
+#    - libcgroup
+#    - jq
+#    - htop
+#    - iftop
+#    - socat
+#    - ipset
+
+#list_pip_pkg:
+#    - ambari_client

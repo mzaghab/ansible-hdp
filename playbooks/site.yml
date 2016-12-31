@@ -1,0 +1,4 @@
+---
+- include: init.yml
+- include: kerberos.yml
+- include: hdp-cluster.yml

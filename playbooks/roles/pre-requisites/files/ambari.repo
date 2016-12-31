@@ -1,0 +1,9 @@
+#VERSION_NUMBER=2.4.0.1-1
+
+[Updates-ambari-2.4.0.1]
+name=ambari-2.4.0.1 - Updates
+baseurl=http://192.168.56.109/hortonworks/ambari/centos7/2.x/updates/2.4.0.1
+gpgcheck=1
+gpgkey=http://192.168.56.109/hortonworks/ambari/centos7/2.x/updates/2.4.0.1/RPM-GPG-KEY/RPM-GPG-KEY-Jenkins
+enabled=1
+priority=1

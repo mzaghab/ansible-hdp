@@ -1,0 +1,24 @@
+- name: install jdk "{{ jdk }}"
+  yum: name="{{ jdk }}" state=present update_cache=yes
+
+#- name: override java  policy for kerberos support
+#  copy: src=jce8/{{ item }} dest="/usr/java/jdk{{ jdk_version }}/jre/lib/security/{{ item }}" owner=root group=root mode=0644
+#  with_items:
+#    - local_policy.jar
+#    - US_export_policy.jar
+
+- name: Update java alternatives
+  alternatives: name=java link=/usr/bin/java path={{java_home}}/bin/java
+#  alternatives: name=java link=/usr/bin/java path=/usr/lib/jvm/{{ jdk_version }}.x86_64/bin/java
+#  alternatives: name=java path=/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/java
+
+#- name: check Java  installed
+#  shell: "{{ jdk_home }}/bin/java -version"
+#  register: jdk
+#  changed_when: False
+
+#- name: "Check jdk '{{ jdk_version }}' is properly installed"
+#  assert:
+#    that:
+#      - '"{{ jdk_version }}" in jdk.stderr'
+#      - '"Java HotSpot" in jdk.stderr'
