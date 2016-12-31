@@ -1,0 +1,54 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+hosts = {
+  "vag-hdp001" => ["192.168.162.101", "3072", "2","22201"],
+  "vag-hdp002" => ["192.168.162.102", "1024", "1","22202"],
+  "vag-hdp003" => ["192.168.162.103", "1024", "1","22203"],
+  "vag-hdp004" => ["192.168.162.104", "1024", "1","22204"]
+}
+
+# install plugins if needed
+if !Vagrant.has_plugin?("vagrant-proxyconf") 
+     	system('vagrant plugin install vagrant-proxyconf')     
+     
+     raise("vagrant-proxyconf installed. Run command again.");
+end
+if !Vagrant.has_plugin?("vagrant-hostmanager") 
+     	system('vagrant plugin install vagrant-hostmanager')     
+     
+     raise("vagrant-hostmanager installed. Run command again.");
+end
+if !Vagrant.has_plugin?("vagrant-cachier") 
+     	system('vagrant plugin install vagrant-cachier')     
+     
+     raise("vagrant-cachier installed. Run command again.");
+end
+
+Vagrant.configure(2) do |config|
+  config.vm.box = "centos/6" 
+  config.vm.box_check_update = false
+  config.hostmanager.enabled = true
+  config.hostmanager.manage_host = false
+  config.hostmanager.ignore_private_ip = false
+  config.hostmanager.include_offline = true
+
+  config.vm.provision "shell",
+     run: "always",
+     inline: "sed -i '1 s/^.*$/127.0.0.1 localhost/g' /etc/hosts"
+
+  hosts.each do |name, infos|
+    config.vm.define name do |node01|
+     node01.vm.hostname = "%s.mzaghab.com" % name
+     node01.hostmanager.aliases = name
+     node01.vm.network :private_network, ip: infos[0]
+     node01.vm.network :forwarded_port, guest: 22, host: infos[3], id: 'ssh'
+     node01.vm.provider "virtualbox" do |v|
+       v.name = name
+       v.customize ["modifyvm", :id, "--memory", infos[1]]
+       v.customize ["modifyvm", :id, "--cpus", infos[2]]
+       v.gui = false
+     end
+    end
+  end
+end
