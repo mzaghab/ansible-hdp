@@ -1,0 +1,63 @@
+---
+- name: Install Redhat kerberos packages
+  yum: name={{ item }} state=present update_cache=yes
+  with_items: '{{ kerberos_pkg }}'
+
+- name: Copy kprop
+  template: src=kpropd.acl.j2 dest={{ kerberos_conf }}/kpropd.acl
+  when: master == 'no'
+
+- name: Copy the kdc configuration file 
+  template: src=kdc.conf.j2 dest=/var/kerberos/krb5kdc/kdc.conf
+
+- name: Copy the client configuration file
+  template: src=krb5.conf.j2 dest=/etc/krb5.conf
+
+- name: Copy the kdc acl configuration file 
+  template: src=kadm5.acl.j2 dest={{ kerberos_conf }}/kadm5.acl
+
+- name: Link /dev/random to /dev/urandom
+  file: path=/dev/random src=/dev/urandom state=link force=yes
+
+- name: Create the initial kerberos database
+  shell: >
+    if [ ! -f {{ kerberos_conf }}/principal ];then echo -e "{{ master_db_pass }}\n{{ master_db_pass }}" | kdb5_util create -s;fi
+
+- name: Start the kerberos services 
+  service: name=krb5kdc state=started enabled=yes
+
+- name: Restart kadmin only
+  service: name=kadmin state=restarted
+  when: master == 'yes'
+
+- name: Create an admin for the administering the kerberos database
+  shell: echo -e "{{ kadmin_pass }}\n{{ kadmin_pass }}" | kadmin.local  -q "addprinc {{ kadmin_user }}/admin"
+  when: master == 'yes'
+
+- name: Add host principal entry
+  shell: >
+    echo -e "{{ kadmin_pass }}\n{{ kadmin_pass }}" | kadmin -p {{ kadmin_user }}/admin -q "addprinc -randkey host/{{ inventory_hostname }}"
+
+- name: remove keytab file
+  file: path=/etc/krb5.keytab state=absent
+
+- name: Addings principals to keytab
+  shell: >
+    echo -e "{{ kadmin_pass }}\n{{ kadmin_pass }}" | kadmin -p {{ kadmin_user }}/admin -q "ktadd -norandkey host/{{ inventory_hostname }}"
+
+- name: Start kprop on slave to synchronize database
+  service: name=kprop state=started
+  when: master == 'no'
+
+- name: Copy Management slave script
+  template: src=krb5prop.sh.j2 dest={{ kerberos_conf }}/krb5prop.sh mode=0755
+  when: master == 'yes'
+
+- name: Prepare Cron for Slave Sync
+  template: src=krb5prop.j2 dest=/etc/cron.d/krb5prop
+  when: master == 'yes'
+
+#- name: Launch Propagation kdc database on slave
+#  shell: "{{ kerberos_conf }}/krb5prop.sh"
+#  when: master == 'yes'
+

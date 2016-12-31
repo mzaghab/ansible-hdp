@@ -1,4 +1,7 @@
 #!/bin/bash
+# Author : Mounir ZAGHAB
+# Date : 31/07/2016 
+
 cd /tmp
 git clone https://github.com/apache/incubator-ambari.git
 cd incubator-ambari/ambari-client/

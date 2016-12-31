@@ -7,25 +7,15 @@ vag-hdp004 ansible_host=127.0.0.1 ansible_port=22204 ansible_ssh_private_key_fil
 [all:vars]
 site=vagrant
 
-[vagrant:children]
-cdh
-cdh-client
-
-[cdh]
+[hdp]
 vag-hdp001
 vag-hdp002
 vag-hdp003
 vag-hdp004
 
-[cdh-edge]
-vag-hdp001
-
-[cdh-client]
-vag-hdp004
-
-[cm-server]
+[ambari-server]
 vag-hdp001
 
 [kerberos]
-vag-hdp001
-vag-hdp002
+vag-hdp001 master=yes
+vag-hdp002 master=no

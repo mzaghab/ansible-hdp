@@ -1,0 +1,4 @@
+---
+- include: kerberos.yml
+  tags: kerberos-server
+

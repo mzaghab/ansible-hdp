@@ -1,4 +1,7 @@
 === Build Environment Test
+
+Author : Mounir ZAGHAB
+
 Use your SSH key
 [source,bash]
 ----
@@ -8,15 +11,15 @@ launch :
 ./setup.sh
 test connectivity 		: ansible -i ../inventories/vagrant-cluster.hosts  -m ping all -u vagrant
 
-Install init   			: ansible-playbook -i ../inventories/vagrant-cluster.hosts playbooks/site.yml -u vagrant --tags init  
+Install init   			: ansible-playbook -i ../inventories/vagrant-cluster.hosts ../playbooks/site.yml -u vagrant --tags init  
 
-Install kerberos  		: ansible-playbook -i ../inventories/vagrant-cluster.hosts playbooks/site.yml -u vagrant --tags kerberos-server 
+Install kerberos  		: ansible-playbook -i ../inventories/vagrant-cluster.hosts ../playbooks/site.yml -u vagrant --tags kerberos-server 
 
-Install hdp  			: ansible-playbook -i ../inventories/vagrant-cluster.hosts playbooks/site.yml -u vagrant --tags hdp 
+Install hdp  			: ansible-playbook -i ../inventories/vagrant-cluster.hosts ../playbooks/site.yml -u vagrant --tags hdp 
 
-Launch all				: ansible-playbook -i ../inventories/vagrant-cluster.hosts playbooks/site.yml -u vagrant
+Launch all				: ansible-playbook -i ../inventories/vagrant-cluster.hosts ../playbooks/site.yml -u vagrant
 
-Ambari UI : http://192.168.161.101:8080/ 
+Ambari UI : http://192.168.162.101:8080/ 
 
 
 

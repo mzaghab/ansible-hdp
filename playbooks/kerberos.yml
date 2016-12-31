@@ -1,0 +1,7 @@
+- hosts: kerberos
+  serial: "{{ serial_strategy|default(\"{{ groups['all']|length }}\")|int}}"
+  vars_files:
+    - secrets/{{site}}-secrets.yml
+    - group_vars/{{ site }}
+  roles:
+    - {role: kerberos , tags: kerberos-server }

@@ -1,0 +1,21 @@
+{ "blueprint":"blueprint-cluster",
+"default_password" : "hadoop",
+  "host-groups":[
+    { "name":"host_group_1",
+      "hosts":[ { "fqdn":vag.hdp101.mzaghab.com",
+                "rack_info": "/dc1/rack1"
+				 } 
+			] },
+    { "name":"host_group_2",
+      "hosts":[ { "fqdn":vag.hdp102.mzaghab.com" 
+                "rack_info": "/dc1/rack1"
+      			}
+      		 ] },
+    { "name":"host_group_3",
+      "hosts":[ { "fqdn":vag.hdp103.mzaghab.com" 
+                "rack_info": "/dc1/rack1"
+      			}
+      		 ] },
+     } 
+  ] 
+}

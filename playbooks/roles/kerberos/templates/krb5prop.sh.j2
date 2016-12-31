@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+/usr/sbin/kdb5_util dump {{ kerberos_conf }}/slave_datatrans
+/usr/sbin/kprop -f {{ kerberos_conf }}/slave_datatrans {{ groups.kerberos[1] }}

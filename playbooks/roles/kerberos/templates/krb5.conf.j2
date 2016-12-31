@@ -1,0 +1,36 @@
+[logging]
+ default = FILE:/var/log/krb5libs.log
+ kdc = FILE:/var/log/krb5kdc.log
+ admin_server = FILE:/var/log/kadmind.log
+
+[libdefaults]
+ default_realm = {{ realm_name|upper() }}
+ dns_lookup_realm = false
+ dns_lookup_kdc = false
+ ticket_lifetime = 24h
+ renew_lifetime = 7d
+ forwardable = true
+
+[realms]
+ {{ realm_name| upper() }} = {
+  {% for server in groups.kerberos %}
+   kdc = {{ server }}:88
+  {% endfor %}
+  admin_server = {{ groups.kerberos[0] }}:749
+  default_domain = mzaghab.com
+ }
+
+[domain_realm]
+ .{{ realm_name|lower() }} = {{ realm_name|upper() }}
+  {{ realm_name|lower() }} = {{ realm_name|upper() }}
+       .{{ domainname }}  = {{ realm_name|upper() }}
+        {{ domainname }}  = {{ realm_name|upper() }}
+
+[appdefaults]
+ pam = {
+   debug = false
+   ticket_lifetime = 36000
+   renew_lifetime = 36000
+   forwardable = true
+   krb4_convert = false
+ }

@@ -1,0 +1,15 @@
+- hosts: all
+  vars_files:
+    - secrets/{{site}}-secrets.yml
+    - group_vars/{{ site }}
+  roles:
+    - {role: hdp-install , tags: [hdp,hdp-install] }
+#    - {role: zookeeper ,    tags: [hdp,zookeeper] }
+#    - {role: hdfs ,         tags: [hdp,hdfs] }
+#    - {role: yarn ,         tags: [hdp,yarn] }
+#    - {role: hive ,         tags: [hdp,hive] }
+#    - {role: oozie ,        tags: [hdp,oozie] }
+#    - {role: impala ,       tags: [hdp,impala] }
+#    - {role: hue ,          tags: [hdp,hue] }
+#    - {role: spark-on-yarn ,tags: [hdp,spark-on-yarn] }
+#    - {role: cdh-kerberos  ,tags: [hdp,hdp-kerberos] }

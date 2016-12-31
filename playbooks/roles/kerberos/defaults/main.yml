@@ -1,0 +1,4 @@
+---
+kdc_port: 88
+master_db_pass: "{{ vault_master_kdc_password }}"
+kerberos_conf: /var/kerberos/krb5kdc

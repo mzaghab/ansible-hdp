@@ -1,8 +1,8 @@
 ---
 - hosts: all
   serial: "{{ serial_strategy|default(\"{{ groups['all']|length }}\")|int}}"
-#  vars_files:
-#        - secrets/{{site}}-secrets.yml
+  vars_files:
+        - secrets/{{site}}-secrets.yml
   roles:
     - {role: pre-requisites, tags: [init] }
     - {role: jdk , tags: [init]}

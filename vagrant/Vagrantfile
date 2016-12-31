@@ -1,5 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
+# Author : Mounir ZAGHAB
+# Date : 31/07/2016 
 
 hosts = {
   "vag-hdp001" => ["192.168.162.101", "3072", "2","22201"],

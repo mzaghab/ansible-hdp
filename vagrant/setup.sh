@@ -1,4 +1,6 @@
 #!/bin/bash
+# Author : Mounir ZAGHAB
+# Date : 31/07/2016 
 
 export VAGRANT_HTTP_PROXY=${http_proxy}
 export VAGRANT_YUM_HTTP_PROXY=${http_proxy}

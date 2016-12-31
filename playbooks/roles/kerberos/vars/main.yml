@@ -1,0 +1,10 @@
+---
+kerberos_pkg:
+  - libselinux-python
+  - krb5-auth-dialog
+  - krb5-libs 
+  - krb5-server 
+  - krb5-workstation
+  - krb5-pkinit-openssl
+user_kdc_admin:
+  - root

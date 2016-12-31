@@ -1,0 +1,6 @@
+---
+- include: hdp-install.yml
+  tags: [hdp-install]
+
+- include: hdp-cluster.yml
+  tags: [hdp-cluster]

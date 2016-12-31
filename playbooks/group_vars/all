@@ -1,0 +1,10 @@
+---
+
+jdk: java-1.8.0-openjdk-devel
+java_home: /usr/lib/jvm/java-1.8.0-openjdk.x86_64
+
+#############    KERBEROS     ###########################
+realm_name: "MZAGHAB.COM"
+domainname: "mzaghab.com"
+kadmin_user: root
+kadmin_pass: "{{ vault_admin_kdc_password }}"
