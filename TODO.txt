@@ -1,0 +1,6 @@
+# Author : Mounir ZAGHAB
+# Date : 31/07/2016 
+
+- install oracle jdk (http://tecadmin.net/install-java-8-on-centos-rhel-and-fedora/)
+- module jdk (variable in install alternative)
+- kerberos role : uncomment "Launch Propagation kdc database on slave" task
