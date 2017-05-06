@@ -10,12 +10,12 @@
   yum: name={{ item }} state=present update_cache=yes
   with_items:
     "{{list_yum_pkg}}"
-        
+
 - name: Copy ambari repo file
-  copy: src=ambari.repo dest=/etc/yum.repos.d/ambari.repo
+  template: src=ambari.repo.j2 dest=/etc/yum.repos.d/ambari.repo
 
 - name: Copy hdp repo file
-  copy: src=hdp.repo dest=/etc/yum.repos.d/hdp.repo
+  template: src=hdp.repo.j2 dest=/etc/yum.repos.d/hdp.repo
 
 - name: Check if selinux is disabled
   shell: "sestatus | grep \"SELinux status\""
@@ -56,18 +56,5 @@
   ignore_errors: True
   register: ambari_client_installed
   changed_when: False
-
-- name: copy ambari lib install script
-  copy: src=install_ambari_lib.sh dest=/tmp mode="711"
-  run_once: true
-  delegate_to: "{{groups['ambari-server'][0]}}"
-  when: ambari_client_installed.rc != 0
- 
-- name: launch install script ambari python library)
-  shell: /tmp/install_ambari_lib.sh
-  run_once: true
-  delegate_to: "{{groups['ambari-server'][0]}}"
-  when: ambari_client_installed.rc != 0
-
 
  
