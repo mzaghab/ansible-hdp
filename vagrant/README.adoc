@@ -5,7 +5,7 @@ Author : Mounir ZAGHAB
 Use your SSH key
 [source,bash]
 ----
-install hdp cluster : http://docs.hortonworks.com/HDPDocuments/Ambari-2.4.1.0/bk_ambari-installation/content/ch_Getting_Ready.html
+install hdp cluster : http://docs.hortonworks.com/HDPDocuments/Ambari-2.5.0.3/bk_ambari-installation/content/ch_Getting_Ready.html
 
 launch :
 ./setup.sh
@@ -17,7 +17,7 @@ Install kerberos  		: ansible-playbook -i ../inventories/vagrant-cluster.hosts .
 
 Install hdp  			: ansible-playbook -i ../inventories/vagrant-cluster.hosts ../playbooks/site.yml -u vagrant --tags hdp 
 
-Launch all				: ansible-playbook -i ../inventories/vagrant-cluster.hosts ../playbooks/site.yml -u vagrant
+Launch all			: ansible-playbook -i ../inventories/vagrant-cluster.hosts ../playbooks/site.yml -u vagrant
 
 Ambari UI : http://192.168.162.101:8080/ 
 

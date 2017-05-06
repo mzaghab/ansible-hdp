@@ -1,5 +1,6 @@
 ---
-
+#############    COMMON     ###########################
+internal_repo: http://192.168.56.109
 jdk: java-1.8.0-openjdk-devel
 java_home: /usr/lib/jvm/java-1.8.0-openjdk.x86_64
 
