@@ -50,11 +50,3 @@
 - name: Activate ntpd
   service: name=ntpd state=started enabled=yes
   when: ntpd_status.stat.exists == False
-  
-- name: Check if python ambari_client is disabled
-  shell: "python -c 'import ambari_client'"
-  ignore_errors: True
-  register: ambari_client_installed
-  changed_when: False
-
- 
