@@ -2,8 +2,26 @@
 
 DOCUMENTATION = '''
 ---
-init cluster using hdp blueprint : 
-http://docs.hortonworks.com/HDPDocuments/Ambari-2.4.1.0/bk_ambari-reference/content/ch_using_ambari_blueprints.html
+https://github.com/apache/ambari/blob/trunk/ambari-server/docs/api/v1/index.md
+
+installation steps : http://docs.hortonworks.com/HDPDocuments/Ambari-2.5.0.3/bk_ambari-installation/content/ch_Deploy_and_Configure_a_HDP_Cluster.html
+    Log In to Apache Ambari
+    Launch the Ambari Cluster Install Wizard
+    Name Your Cluster
+    Select Version
+    Install Options
+    Confirm Hosts
+    Choose Services
+    Assign Masters
+    Assign Slaves and Clients
+    Customize Services
+    Review
+    Install, Start and Test
+    Complete
+
+cluster ressource : https://github.com/apache/ambari/blob/trunk/ambari-server/docs/api/v1/cluster-resources.md
+service ressource : https://github.com/apache/ambari/blob/trunk/ambari-server/docs/api/v1/service-resources.md
+
 '''
 
 EXAMPLES = '''
@@ -23,8 +41,8 @@ def main():
             ambari_username=dict(required=True, type='str'),
             ambari_password=dict(required=True, type='str', no_log=True),
             hdp_cluster_name=dict(required=True, type='str'),
-            hdp_hosts=dict(required=True, type='list'),
-            services=dict(required=True, type='list'),
+            hdp_hosts=dict(required=False, type='list'),
+            services=dict(required=False, type='list'),
             parcel_url=dict(required=False, type='str'),
             parcel_version=dict(required=False, type='str'),
         )
@@ -48,35 +66,34 @@ def main():
     try:
         changed = False
 
-        api = ApiResource(ambari_host, server_port=ambari_port, username=ambari_username, password=ambari_password)
-
         # 1 - create cluster
-        cluster = create_cluster(module, api, hdp_cluster_name)
+#        cluster = create_cluster(module, api, hdp_cluster_name)
         # 2 - add hosts
-        create_hosts(module, api, cluster, hdp_hosts)
+#        create_hosts(module, api, cluster, hdp_hosts)
         # 3 - set parcels
-        set_parcels(module, api, cluster, parcel_url, parcel_version)
+#        set_parcels(module, api, cluster, parcel_url, parcel_version)
 #        return
         # 4 - create services & roles
         # [ "hdfs", "zookeeper", "yarn", "oozie", "hive", "hue", "impala", "spark_on_yarn"]
-        create_services(module, api, cluster, services)
+#        create_services(module, api, cluster, services)
         # 5 - restart services
 #        service.restart()
 
         # restart all if changed is true
-        cluster.stop().wait()
-        cluster.start().wait()
+#        cluster.stop().wait()
+#        cluster.start().wait()
 
 
         module.exit_json(changed=changed)
 
-    except ApiException as e:
+    except Exception as e:
         module.fail_json(changed=False, msg="Problem when installing cluster : %s" % e)
+
 def create_cluster(module, api, hdp_cluster_name):
     cluster = None
     try:
         cluster = api.get_cluster(hdp_cluster_name)
-    except ApiException as e:
+    except Exception as e:
         if 'not found' in e._message:
             cluster = api.create_cluster(hdp_cluster_name)
     return cluster
@@ -93,7 +110,6 @@ def create_hosts(module, ambari_api, cluster, hdp_hosts):
     existing_cluster_hosts = [x.hostId for x in cluster.list_hosts()]
     missing_cluster_host = [x for x in cluster_hosts if x.hostId not in existing_cluster_hosts]
     cluster.add_hosts([x.hostId for x in missing_cluster_host])
-
 
 def create_services(module, ambari_api, cluster, services):
     existing_services = [x.type for x in cluster.get_all_services()]
