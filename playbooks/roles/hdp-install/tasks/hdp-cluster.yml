@@ -1,3 +1,9 @@
 ---
 - name: cluster install
-  debug: msg="TODO"
+  hdp_install:
+    ambari_host: "{{ambari_host}}"
+    ambari_port: "{{ambari_port}}"
+    ambari_username: "{{ambari_username}}"
+    ambari_password: "{{ambari_password}}"
+    hdp_cluster_name: "{{hdp_cluster_name}}"
+  delegate_to: "{{groups['ambari-server'][0]}}"
