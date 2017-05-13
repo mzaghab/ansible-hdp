@@ -50,3 +50,17 @@
 - name: Activate ntpd
   service: name=ntpd state=started enabled=yes
   when: ntpd_status.stat.exists == False
+
+- name: Check if requests is installed
+  shell: "python -c 'import requests'"
+  ignore_errors: True
+  register: requests_installed
+  changed_when: False
+
+- name: install requests package via pip
+  pip: name=requests version=2.10.0
+  when: requests_installed.rc != 0
+
+- name: Validate requests installed
+  shell: "python -c 'import requests'"
+  when: requests_installed.rc != 0
