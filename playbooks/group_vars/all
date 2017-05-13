@@ -1,6 +1,6 @@
 ---
 #############    COMMON     ###########################
-internal_repo: http://192.168.56.109
+internal_repo: http://192.168.56.114
 jdk: java-1.8.0-openjdk-devel
 java_home: /usr/lib/jvm/java-1.8.0-openjdk.x86_64
 
@@ -9,3 +9,10 @@ realm_name: "MZAGHAB.COM"
 domainname: "mzaghab.com"
 kadmin_user: root
 kadmin_pass: "{{ vault_admin_kdc_password }}"
+
+#############     AMBARI      ###########################
+ambari_host: groups['ambari-server'][0]
+ambari_port: "8080"
+ambari_username: "admin"
+ambari_password: "admin"
+hdp_cluster_name: "cluster_hdp"
