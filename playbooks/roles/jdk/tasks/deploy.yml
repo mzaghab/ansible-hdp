@@ -1,6 +1,9 @@
 - name: install jdk "{{ jdk }}"
   yum: name="{{ jdk }}" state=present update_cache=yes
 
+#curl -v -j -k -L -H "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u112-b15/jdk-8u112-linux-x64.rpm > /tmp/jdk-8u112-linux-x64.rpm
+#yum localinstall -y /tmp/jdk-8u112-linux-x64.rpm
+
 #- name: override java  policy for kerberos support
 #  copy: src=jce8/{{ item }} dest="/usr/java/jdk{{ jdk_version }}/jre/lib/security/{{ item }}" owner=root group=root mode=0644
 #  with_items:
