@@ -1,21 +1,21 @@
 [all]
-vag-hdp001 ansible_host=127.0.0.1 ansible_port=22201 ansible_ssh_private_key_file=.vagrant/machines/vag-hdp001/virtualbox/private_key host_ip=192.168.162.101 private_host_ip=192.168.161.101 private_hostname=vag-hdp001
-vag-hdp002 ansible_host=127.0.0.1 ansible_port=22202 ansible_ssh_private_key_file=.vagrant/machines/vag-hdp002/virtualbox/private_key host_ip=192.168.162.102 private_host_ip=192.168.161.102 private_hostname=vag-hdp002
-vag-hdp003 ansible_host=127.0.0.1 ansible_port=22203 ansible_ssh_private_key_file=.vagrant/machines/vag-hdp003/virtualbox/private_key host_ip=192.168.162.103 private_host_ip=192.168.161.103 private_hostname=vag-hdp003
-vag-hdp004 ansible_host=127.0.0.1 ansible_port=22204 ansible_ssh_private_key_file=.vagrant/machines/vag-hdp004/virtualbox/private_key host_ip=192.168.162.101 private_host_ip=192.168.161.104 private_hostname=vag-hdp004
+vag-hdp001.mzaghab.com ansible_host=127.0.0.1 ansible_port=22201 ansible_ssh_private_key_file=.vagrant/machines/vag-hdp001/virtualbox/private_key host_ip=192.168.162.101 private_host_ip=192.168.161.101 private_hostname=vag-hdp001
+vag-hdp002.mzaghab.com ansible_host=127.0.0.1 ansible_port=22202 ansible_ssh_private_key_file=.vagrant/machines/vag-hdp002/virtualbox/private_key host_ip=192.168.162.102 private_host_ip=192.168.161.102 private_hostname=vag-hdp002
+vag-hdp003.mzaghab.com ansible_host=127.0.0.1 ansible_port=22203 ansible_ssh_private_key_file=.vagrant/machines/vag-hdp003/virtualbox/private_key host_ip=192.168.162.103 private_host_ip=192.168.161.103 private_hostname=vag-hdp003
+vag-hdp004.mzaghab.com ansible_host=127.0.0.1 ansible_port=22204 ansible_ssh_private_key_file=.vagrant/machines/vag-hdp004/virtualbox/private_key host_ip=192.168.162.101 private_host_ip=192.168.161.104 private_hostname=vag-hdp004
 
 [all:vars]
 site=vagrant
 
 [hdp]
-vag-hdp001
-vag-hdp002
-vag-hdp003
-vag-hdp004
+vag-hdp001.mzaghab.com
+vag-hdp002.mzaghab.com
+vag-hdp003.mzaghab.com
+vag-hdp004.mzaghab.com
 
 [ambari-server]
-vag-hdp001
+vag-hdp001.mzaghab.com
 
 [kerberos]
-vag-hdp001 master=yes
-vag-hdp002 master=no
+vag-hdp001.mzaghab.com master=yes
+vag-hdp002.mzaghab.com master=no
