@@ -3,7 +3,8 @@
     - secrets/{{site}}-secrets.yml
     - group_vars/{{ site }}
   roles:
-    - {role: hdp-install , tags: [hdp,hdp-install] }
+    - {role: ambari , tags: [hdp,ambari] }
+    - {role: hdp-cluster , tags: [hdp,hdp-cluster] }
 #    - {role: zookeeper ,    tags: [hdp,zookeeper] }
 #    - {role: hdfs ,         tags: [hdp,hdfs] }
 #    - {role: yarn ,         tags: [hdp,yarn] }
