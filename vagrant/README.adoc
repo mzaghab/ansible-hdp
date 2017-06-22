@@ -1,9 +1,9 @@
-=== Build Environment Test
+=== Build Vagrant Environment 
 
 Author : Mounir ZAGHAB
 
-Use your SSH key
-[source,bash]
+Init cluster VM : 
+
 ----
 install hdp cluster : http://docs.hortonworks.com/HDPDocuments/Ambari-2.5.0.3/bk_ambari-installation/content/ch_Getting_Ready.html
 
@@ -11,39 +11,40 @@ launch :
 ./setup.sh
 test connectivity 		: ansible -i ../inventories/vagrant-cluster.hosts  -m ping all -u vagrant
 
-Install init   			: ansible-playbook -i ../inventories/vagrant-cluster.hosts ../playbooks/site.yml -u vagrant --tags init  
-
-Install kerberos  		: ansible-playbook -i ../inventories/vagrant-cluster.hosts ../playbooks/site.yml -u vagrant --tags kerberos-server 
-
-Install hdp  			: ansible-playbook -i ../inventories/vagrant-cluster.hosts ../playbooks/site.yml -u vagrant --tags hdp 
-
-Launch all			: ansible-playbook -i ../inventories/vagrant-cluster.hosts ../playbooks/site.yml -u vagrant
+Install init   			: ansible-playbook -i ../ansible/inventories/vagrant-cluster.hosts ../ansible/playbooks/site.yml -u vagrant --tags init  
 
 Ambari UI : http://192.168.162.101:8080/ 
 
+vagrant ssh vag001
+----
+Blueprint cluster creation : 
+----
+https://cwiki.apache.org/confluence/display/AMBARI/Blueprints
 
+- list of blueprint : 
+	curl --user admin:admin -i -X GET http://192.168.162.101:8080/api/v1/blueprints
+- Register Blueprint with Ambari
+	curl --user admin:admin -i -X POST -H X-Requested-By:ambari -d @mycluster.json http://192.168.162.101:8080/api/v1/blueprints/myblueprint
+- Delete registered Blueprint :
+	curl --user admin:admin -i -X DELETE -H X-Requested-By:ambari http://192.168.162.101:8080/api/v1/blueprints/myblueprint
+- Setup Stack Repositories (Optional)
+	curl --user admin:admin -i -X PUT -H X-Requested-By:ambari -d '{"Repositories":{"base_url":"http://192.168.56.114/hortonworks/HDP/2.6/centos6/","verify_base_url":"true"}}' http://192.168.162.101:8080/api/v1/stacks/HDP/versions/2.6/operating_systems/redhat6/repositories/HDP-2.6
+	curl --user admin:admin -i -X PUT -H X-Requested-By:ambari -d '{"Repositories":{"base_url":"http://192.168.56.114/hortonworks/HDP-UTILS-1.1.0.21/centos6/","verify_base_url":"true"}}' http://192.168.162.101:8080/api/v1/stacks/HDP/versions/2.6/operating_systems/redhat6/repositories/HDP-UTILS-1.1.0.21
+- Create Cluster
+	curl --user admin:admin -i -X POST -H X-Requested-By:ambari -d @myhostmapping.json http://192.168.162.101:8080/api/v1/clusters/mycluster
+- List Cluster :
+	curl --user admin:admin -i -X GET http://192.168.162.101:8080/api/v1/clusters/
+----
 
+Rest API cluster creation TODO: 
 
+----
+https://cwiki.apache.org/confluence/display/AMBARI/Create+a+new+Cluster
+Install hdp  		: ansible-playbook -i ../ansible/inventories/vagrant-cluster.hosts ../ansible/playbooks/site.yml -u vagrant --tags hdp 
 
-Install cluster : ansible-playbook -i vagrant-cluster.hosts ../playbooks/site.yml --tags cdh-install -u vagrant -e cdh_new_install='True'
+Launch all			: ansible-playbook -i ../ansible/inventories/vagrant-cluster.hosts ../ansible/playbooks/site.yml -u vagrant
+
+Install cluster		: ansible-playbook -i vagrant-cluster.hosts ../playbooks/site.yml --tags cdh-install -u vagrant -e cdh_new_install='True'
 
 do all in one shot :  ansible-playbook via : ansible-playbook -i vagrant-cluster.hosts ../playbooks/site.yml -u vagrant -e cdh_new_install='True'
-
-vagrant ssh vag001
-
-
-sur tous les noeud autre que le master
-sudo cp /vagrant/files/cloudera.repo  /etc/yum.repos.d/
-sudo yum -y install cloudera-manager-agent 
-----
-
-----
-
-acess cm UI : http://192.168.160.101:7180/cmf/
-
-
-parcels : http://sltbda01.dcn.fr.carrefour.com/bda/PARCELS/CDH
-cdm : https://phenix-repository.edc.carrefour.com/el6/
-
- 
 ----
