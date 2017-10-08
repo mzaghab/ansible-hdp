@@ -3,6 +3,7 @@
 DOCUMENTATION = '''
 ---
 https://github.com/apache/ambari/blob/trunk/ambari-server/docs/api/v1/index.md
+https://cwiki.apache.org/confluence/display/AMBARI/Create+a+new+Cluster
 
 installation steps : http://docs.hortonworks.com/HDPDocuments/Ambari-2.5.0.3/bk_ambari-installation/content/ch_Deploy_and_Configure_a_HDP_Cluster.html
     Log In to Apache Ambari

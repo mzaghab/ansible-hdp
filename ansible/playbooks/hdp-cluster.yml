@@ -1,7 +1,7 @@
 - hosts: all
-  vars_files:
-    - secrets/{{site}}-secrets.yml
-    - group_vars/{{ site }}
+#  vars_files:
+#    - secrets/{{site}}-secrets.yml
+#    - group_vars/{{ site }}
   roles:
     - {role: ambari , tags: [hdp,ambari] }
     - {role: hdp-cluster , tags: [hdp,hdp-cluster] }
