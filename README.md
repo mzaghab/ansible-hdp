@@ -8,6 +8,8 @@ Author : Mounir ZAGHAB
 Init cluster VM : 
 
 ----
+https://docs.hortonworks.com/
+
 install hdp cluster : http://docs.hortonworks.com/HDPDocuments/Ambari-2.5.0.3/bk_ambari-installation/content/ch_Getting_Ready.html
 
 launch :
@@ -19,17 +21,24 @@ Install init                : ansible-playbook -i ../ansible/inventories/vagrant
 
 Install ambari server /agent: ansible-playbook -i ../ansible/inventories/vagrant-cluster.hosts ../ansible/playbooks/site.yml -u vagrant --tags ambari  
 
-Ambari UI : http://192.168.162.101:8080/ 
+Ambari UI   : http://192.168.162.101:8080/ 
+    
+ssh connect : vagrant ssh vag-hdp001
 
-vagrant ssh vag001
-----
 Blueprint cluster creation : 
 ----
 https://cwiki.apache.org/confluence/display/AMBARI/Blueprints
+- Register Blueprint with Ambari :
+	curl --user admin:admin -i -X POST -H X-Requested-By:ambari -d @mycluster.json http://192.168.162.101:8080/api/v1/blueprints/myblueprint
+- Create Cluster :
+	curl --user admin:admin -i -X POST -H X-Requested-By:ambari -d @myhostmapping.json http://192.168.162.101:8080/api/v1/clusters/mycluster
 
+Usefull blueprint curls : 
+- Export blueprint from existing cluster :
+	curl --user admin:admin -i -X GET http://192.168.162.101:8080/api/v1/clusters/:clusterName?format=blueprint
 - list of blueprint : 
 	curl --user admin:admin -i -X GET http://192.168.162.101:8080/api/v1/blueprints
-- Register Blueprint with Ambari
+- Register Blueprint with Ambari :
 	curl --user admin:admin -i -X POST -H X-Requested-By:ambari -d @mycluster.json http://192.168.162.101:8080/api/v1/blueprints/myblueprint
 - Delete registered Blueprint :
 	curl --user admin:admin -i -X DELETE -H X-Requested-By:ambari http://192.168.162.101:8080/api/v1/blueprints/myblueprint
@@ -40,9 +49,14 @@ https://cwiki.apache.org/confluence/display/AMBARI/Blueprints
 	curl --user admin:admin -i -X POST -H X-Requested-By:ambari -d @myhostmapping.json http://192.168.162.101:8080/api/v1/clusters/mycluster
 - List Cluster :
 	curl --user admin:admin -i -X GET http://192.168.162.101:8080/api/v1/clusters/
+- Delete Cluster : 
+    curl --user admin:admin -i -X DELETE -H X-Requested-By:ambari http://192.168.162.101:8080/api/v1/clusters/mycluster
+
 ----
 
 Rest API cluster creation TODO: 
+https://cwiki.apache.org/confluence/display/AMBARI/Add+a+host+and+deploy+components+using+APIs
+
 
 ----
 https://cwiki.apache.org/confluence/display/AMBARI/Create+a+new+Cluster
@@ -53,4 +67,5 @@ Launch all			: ansible-playbook -i ../ansible/inventories/vagrant-cluster.hosts 
 Install cluster		: ansible-playbook -i vagrant-cluster.hosts ../playbooks/site.yml --tags cdh-install -u vagrant -e cdh_new_install='True'
 
 do all in one shot :  ansible-playbook via : ansible-playbook -i vagrant-cluster.hosts ../playbooks/site.yml -u vagrant -e cdh_new_install='True'
+
 ----

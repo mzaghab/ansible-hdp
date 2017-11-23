@@ -5,6 +5,7 @@
   roles:
     - {role: ambari , tags: [hdp,ambari] }
     - {role: hdp-cluster , tags: [hdp,hdp-cluster] }
+    - {role: blueprints , tags: [hdp,blueprints] }
 #    - {role: zookeeper ,    tags: [hdp,zookeeper] }
 #    - {role: hdfs ,         tags: [hdp,hdfs] }
 #    - {role: yarn ,         tags: [hdp,yarn] }
