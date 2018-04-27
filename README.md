@@ -10,7 +10,9 @@ Init cluster VM :
 ----
 https://docs.hortonworks.com/
 
-install hdp cluster : http://docs.hortonworks.com/HDPDocuments/Ambari-2.5.0.3/bk_ambari-installation/content/ch_Getting_Ready.html
+install ambari:
+https://docs.hortonworks.com/HDPDocuments/Ambari-2.6.1.5/bk_ambari-installation/content/ch_Getting_Ready.html
+
 
 launch :
 cd vagrant; ./setup.sh
