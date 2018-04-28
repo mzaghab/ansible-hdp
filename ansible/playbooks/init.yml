@@ -2,5 +2,5 @@
 - hosts: all
   serial: "{{ serial_strategy|default(\"{{ groups['all']|length }}\")|int}}"
   roles:
-    - {role: pre-requisites, tags: [init] }
+    - {role: requirements, tags: [init] }
     - {role: jdk , tags: [init]}

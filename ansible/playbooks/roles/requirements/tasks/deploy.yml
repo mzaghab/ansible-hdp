@@ -1,0 +1,69 @@
+---
+#https://docs.hortonworks.com/HDPDocuments/Ambari-2.6.1.5/bk_ambari-installation/content/prepare_the_environment.html
+
+- name: Install epel-release rpm packages
+  yum: 
+    name: "epel-release" 
+    state: present 
+    update_cache: yes
+
+- name: Install additionnals rpm packages
+  yum: 
+    name: "{{ item }}" 
+    state: present 
+    update_cache: yes
+  with_items:
+    "{{list_yum_pkg}}"
+
+- name: Install ntp
+  yum: 
+    name: ntp
+    state: present 
+    update_cache: yes
+
+- name: Enable service ntpd
+  service:
+    name: ntpd
+    state: started
+    enabled: yes
+
+- name: Disable service iptables
+  service:
+    name: firewalld
+    state: stopped
+    enabled: no
+
+- name: Check if selinux is disabled
+  shell: "sestatus | grep \"SELinux status\""
+  register: selinux_status
+
+- name: Disable selinux
+  command: setenforce 0
+  when: "'disabled' not in selinux_status.stdout"
+
+- name: Disable selinux from config file
+  selinux: 
+    state: disabled
+  when: "'disabled' not in selinux_status.stdout"
+
+- name: Disable swap from fstab
+  lineinfile:
+     dest: /etc/fstab
+     state: absent
+     backup: yes
+     regexp: swap
+
+- name: Add motd
+  template: 
+    src: motd.j2 
+    dest: /etc/motd
+
+- name: Copy ambari repo file
+  template: 
+    src: ambari.repo.j2 
+    dest: /etc/yum.repos.d/ambari.repo
+
+- name: Copy hdp repo file
+  template: 
+    src: hdp.repo.j2 
+    dest: /etc/yum.repos.d/hdp.repo

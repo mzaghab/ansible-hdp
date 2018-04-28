@@ -1,4 +1,4 @@
 ---
-- include: init.yml
-- include: kerberos.yml
-- include: hdp-cluster.yml
+- import_playbook: init.yml
+- import_playbook: kerberos.yml
+- import_playbook: hdp-cluster.yml
