@@ -1,7 +1,7 @@
 ---
 #############    COMMON     ###########################
 internal_repo: http://public-repo-1.hortonworks.com
-jdk: java-1.8.0-openjdk-devel
+jdk: java-1.8.0-openjdk-devel-1.8.0.161
 java_home: /usr/lib/jvm/java-1.8.0-openjdk.x86_64
 
 #############    KERBEROS     ###########################
