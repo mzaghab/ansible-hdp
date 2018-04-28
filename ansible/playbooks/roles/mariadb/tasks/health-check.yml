@@ -1,0 +1,6 @@
+---
+- name: standby during restart service
+  wait_for: 
+    port: "{{ mariadb.port }}" 
+    delay: 5 
+    timeout: 20

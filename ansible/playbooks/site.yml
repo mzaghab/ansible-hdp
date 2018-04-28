@@ -1,4 +1,4 @@
 ---
-- import_playbook: init.yml
+- import_playbook: init.yml         # OK
 - import_playbook: kerberos.yml
 - import_playbook: hdp-cluster.yml

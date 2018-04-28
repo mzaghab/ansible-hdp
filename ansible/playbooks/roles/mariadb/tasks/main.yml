@@ -1,0 +1,6 @@
+---
+- include: deploy.yml
+  tags: mariadb
+
+- include: health-check.yml
+  tags: [mariadb,health-check-mariadb]

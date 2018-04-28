@@ -6,3 +6,4 @@ list_yum_pkg:
     - python-httplib2
     - python-devel
     - python-pip
+    - mysql-connector-java

@@ -1,0 +1,25 @@
+---
+
+- name: Copy maridb repo file
+  template: 
+    src: mariadb.repo.j2 
+    dest: /etc/yum.repos.d/mariadb.repo
+
+- name: Install mariadb version {{ mariadb.version }}
+  yum: 
+    name: "{{ item }}" 
+    state: present 
+    update_cache: yes
+  with_items: "{{ mariadb_pkg_name }}"
+
+- name: Start mariadb server to generate schema
+  service: 
+    name: mysql 
+    state: started 
+    enabled: yes
+
+- name: Wait for service start ...
+  wait_for: 
+    port: "{{ mariadb.port }}"
+    delay: 5 
+    timeout: 21

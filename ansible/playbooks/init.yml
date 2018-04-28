@@ -4,3 +4,7 @@
   roles:
     - {role: requirements, tags: [init] }
     - {role: jdk , tags: [init]}
+
+- hosts: mariadb
+  roles:
+    - {role: mariadb , tags: [init]}
