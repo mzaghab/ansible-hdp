@@ -21,8 +21,8 @@ ambari:
 
 ambari_db:
   type: mysql
-  host: groups['mariadb'][0]
-  port: 8080
+  host: "{{ groups['mariadb'][0] }}"
+  port: 3306
   name: ambari
   user: ambari_usr
   password: ambari_pwd

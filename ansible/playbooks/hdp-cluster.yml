@@ -1,4 +1,4 @@
-- hosts: all
+- hosts: hdp
   roles:
     - {role: ambari , tags: [hdp,ambari] }
 #    - {role: hdp-cluster , tags: [hdp,hdp-cluster] }

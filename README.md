@@ -73,7 +73,7 @@ Usefull blueprint curls :
 
 Rest API cluster creation TODO: 
 https://cwiki.apache.org/confluence/display/AMBARI/Add+a+host+and+deploy+components+using+APIs
-
+https://github.com/apache/ambari/tree/trunk/ambari-server/docs/api/v1
 
 ----
 https://cwiki.apache.org/confluence/display/AMBARI/Create+a+new+Cluster

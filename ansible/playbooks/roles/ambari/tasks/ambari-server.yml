@@ -9,9 +9,13 @@
       name: "ambari-server-{{ ambari.version }}" 
       state: present 
       update_cache: yes
+# ambari bug do the ambari-setup in two step
+# https://community.hortonworks.com/content/supportkb/177628/errorreason-db-name-property-not-set-in-config-fil.html
+  - name:  Set Up the Ambari Server 1/2
+    shell: "ambari-server setup -s --database {{ ambari_db.type }} --databaseusername {{ ambari_db.user }} --databasepassword {{ ambari_db.password }} --databasename {{ ambari_db.name }} --databaseport {{ ambari_db.port }} --databasehost {{ ambari_db.host }} --enable-lzo-under-gpl-license"
 
-  - name:  Set Up the Ambari Server
-    shell: "ambari-server setup -s -j {{java_home}} --database {{ ambari_db.type }} --databaseusername {{ ambari_db.user }} --databasepassword {{ ambari_db.password }} --databasename {{ ambari_db.name }} --databaseport {{ ambari_db.port }} --databasehost {{ ambari_db.host }} --jdbc-db {{ ambari_db.type }} --jdbc-driver {{ mysql_connector_java }} --enable-lzo-under-gpl-license"
+  - name:  Set Up the Ambari Server 2/2
+    shell: "ambari-server setup -s -j {{java_home}} --jdbc-db {{ ambari_db.type }} --jdbc-driver {{ mysql_connector_java }}"
 
   - name: Start Ambari server
     shell: "ambari-server start"
