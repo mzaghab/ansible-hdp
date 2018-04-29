@@ -14,11 +14,17 @@ install ambari:
 https://docs.hortonworks.com/HDPDocuments/Ambari-2.6.1.5/bk_ambari-installation/content/ch_Getting_Ready.html
 
 ## AZURE
-test connectivity           : ansible -i ansible/inventories/azure_rm.py  -m ping all
+test connectivity           : 
 
-Install init                : ansible-playbook -i ansible/inventories/azure_rm.py ansible/playbooks/site.yml  --tags init
+`ansible -i ansible/inventories/azure_rm.py  -m ping all`
 
-Install ambari server /agent: ansible-playbook -i ../ansible/inventories/vagrant-cluster.hosts ../ansible/playbooks/site.yml -u vagrant --tags ambari  
+Install init                : 
+
+`ansible-playbook -i ansible/inventories/azure_rm.py ansible/playbooks/site.yml  --tags init`
+
+Install ambari server and agent: 
+
+`ansible-playbook -i ansible/inventories/azure_rm.py ansible/playbooks/site.yml --tags ambari`
 
 Ambari UI   : http://192.168.162.101:8080/ 
 

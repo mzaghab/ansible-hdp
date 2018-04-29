@@ -12,7 +12,7 @@ kadmin_user: root
 kadmin_pass: "{{ vault_admin_kdc_password }}"
 
 #############     AMBARI      ###########################
-ambari_ui: 
+ambari: 
   version: "2.6.1.5"
   host: groups['ambari-server'][0]
   port: "8080"
