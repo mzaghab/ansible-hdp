@@ -1,0 +1,19 @@
+---
+- name: Stop Ambari agent
+  shell: "ambari-agent stop"
+  ignore_errors: True
+
+- name: Install Ambari agent
+  yum: 
+    name: "ambari-agent-{{ ambari.version }}" 
+    state: present 
+    update_cache: yes
+
+- name: update Ambari agent config
+  lineinfile: 
+    dest: /etc/ambari-agent/conf/ambari-agent.ini 
+    regexp: "^hostname=" 
+    line: "hostname={{groups['ambari-server'][0]}}"
+
+- name: Start Ambari agent
+  shell: "ambari-agent start"

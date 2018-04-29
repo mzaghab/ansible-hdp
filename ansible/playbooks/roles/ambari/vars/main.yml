@@ -1,4 +1,1 @@
 ---
-ambari: 
-  version: "2.6.1.5"
-  port: "8080"
