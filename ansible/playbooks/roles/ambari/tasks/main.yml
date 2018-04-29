@@ -1,2 +1,10 @@
 ---
-- include: deploy.yml
+- include: ambari-db.yml
+  tags: ambari-db
+
+- include: ambari-server.yml
+  tags: ambari-server
+
+- include: ambari-agent.yml
+  tags: ambari-agent
+

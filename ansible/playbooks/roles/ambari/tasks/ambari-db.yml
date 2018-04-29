@@ -1,0 +1,12 @@
+---
+- block: 
+  - name: Copy ambari sql database creation script
+    template: 
+      src: ambari-db.sql.j2
+      dest: /tmp/ambari-db.sql
+
+  - name: Execute ambari sql database creation script
+    shell: mysql < /tmp/ambari-db.sql
+
+  run_once: true
+  delegate_to: "{{groups['mariadb'][0]}}"

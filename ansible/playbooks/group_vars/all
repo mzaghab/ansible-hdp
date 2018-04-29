@@ -2,7 +2,8 @@
 #############    COMMON     ###########################
 internal_repo: http://public-repo-1.hortonworks.com
 jdk: java-1.8.0-openjdk-devel-1.8.0.161
-java_home: /usr/lib/jvm/java-1.8.0-openjdk.x86_64
+java_home: /usr/lib/jvm/java
+mysql_connector_java: /usr/share/java/mysql-connector-java.jar
 
 #############    KERBEROS     ###########################
 realm_name: "MZAGHAB.COM"
@@ -11,9 +12,21 @@ kadmin_user: root
 kadmin_pass: "{{ vault_admin_kdc_password }}"
 
 #############     AMBARI      ###########################
-ambari_host: groups['ambari-server'][0]
-ambari_port: "8080"
-ambari_username: "admin"
-ambari_password: "admin"
+ambari_ui: 
+  version: "2.6.1.5"
+  host: groups['ambari-server'][0]
+  port: "8080"
+  user: "admin"
+  password: "admin"
+
+ambari_db:
+  type: mysql
+  host: groups['mariadb'][0]
+  port: 8080
+  name: ambari
+  user: ambari_usr
+  password: ambari_pwd
+  db_script: Ambari-DDL-MySQL-CREATE-2.6.1.5.sql
+
 hdp_cluster_name: "cluster_hdp"
 blueprint_name: "my_blueprint"
