@@ -1,0 +1,7 @@
+---
+
+- include: clean.yml
+  when: azure_clean == 'True'
+
+- include: deploy.yml
+  when: azure_clean == 'False'

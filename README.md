@@ -1,19 +1,54 @@
 # ansible-hdp
 # Author : Mounir ZAGHAB
 # Date : 31/07/2016 
-=== Build Vagrant Environment 
-
-Author : Mounir ZAGHAB
-
-Init cluster VM : 
 
 ----
-https://docs.hortonworks.com/
+Hortonworks docs : 
+- https://docs.hortonworks.com/
 
 install ambari:
-https://docs.hortonworks.com/HDPDocuments/Ambari-2.6.1.5/bk_ambari-installation/content/ch_Getting_Ready.html
+- https://docs.hortonworks.com/HDPDocuments/Ambari-2.6.1.5/bk_ambari-installation/content/ch_Getting_Ready.html
 
-## AZURE
+
+# BUILD THE INFRA CLUSTER (ON AZURE CLOUD)
+
+before launching the azure playbook you must set your azure credential (see azure and ansible documentation for the value to set).
+see : http://docs.ansible.com/ansible/latest/scenario_guides/guide_azure.html
+## option 1. setting below environment variables
+`export AZURE_CLIENT_ID=XXXXXXXXXXXXXX`
+
+`export AZURE_SECRET=XXXXXXXXXXXXXX`
+
+`export AZURE_SUBSCRIPTION_ID=XXXXXXXXXXXXXX`
+
+`export AZURE_TENANT=XXXXXXXXXXXXXX`
+
+or 
+## option 2. add below content to file $HOME/.azure/credentials.
+
+`[default]`
+
+`subscription_id=xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
+
+`client_id=xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
+
+`secret=xxxxxxxxxxxxxxxxx`
+
+`tenant=xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
+
+## AZURE PROVISIONNING VIA ANSIBLE
+to launch the provisionning of the azure instances :
+
+`ansible-playbook -c localhost ansible/playbooks/build_cluster.yml `
+
+Note : due to the ansible bug below (we must wait for the next release), Network interfaces is not affected to the specified Network security groups instead a default one is created, so you must fixe it manually by attaching the created 'Network interfaces' to the 'Network security groups' and delete the Network security groups created by default.
+
+  https://github.com/ansible/ansible/issues/36093
+
+to clean the provisionning of the azure instances :
+
+`ansible-playbook -c localhost ansible/playbooks/site.yml -e azure_clean=True`
+
 test connectivity           : 
 
 `ansible -i ansible/inventories/azure_rm.py  -m ping all`

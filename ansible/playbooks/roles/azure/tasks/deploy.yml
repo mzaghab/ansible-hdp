@@ -1,0 +1,78 @@
+---
+
+- name: Create a resource group "{{ azure_resource_group }}"
+  azure_rm_resourcegroup:
+    name: "{{ azure_resource_group }}"
+    location: "{{ azure_default_location }}"
+
+- name: Create storage account "{{ azure_storage_account }}"
+  azure_rm_storageaccount:
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ azure_storage_account }}"
+    account_type: "{{ azure_storage_account_type }}"
+
+- name: Create virtual network "{{ azure_virtual_network }}"
+  azure_rm_virtualnetwork:
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ azure_virtual_network }}"
+    address_prefixes: "{{ azure_network_address_prefixes }}"
+
+- name: Add subnet "{{ azure_subnet }}"
+  azure_rm_subnet:
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ azure_subnet }}"
+    address_prefix: "{{ azure_network_address_prefixes }}"
+    virtual_network: "{{ azure_virtual_network }}"
+
+- name: Create security group that allows Inboud traffic on some port "{{ azure_security_group }}"
+  azure_rm_securitygroup:
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ azure_security_group }}"
+    rules:
+      - name: SSH
+        protocol: Tcp
+        destination_port_range: 22
+        access: Allow
+        priority: 101
+        direction: Inbound
+      - name: HTTP_8080
+        protocol: Tcp
+        destination_port_range: 8080
+        access: Allow
+        priority: 102
+        direction: Inbound
+
+- name: Create Network Interfaces
+  azure_rm_networkinterface:
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ item.virtual_interface }}"
+    security_group: "{{ azure_security_group }}"
+    virtual_network: "{{ azure_virtual_network }}"
+    subnet: "{{ azure_subnet }}"
+    ip_configurations:
+      - name: "{{ item.ip_config_name }}"
+        public_ip_address_name: "{{ item.public_ip }}"
+        primary: True
+  with_items: "{{ azure_virtual_machines }}"
+
+- name: Create virtual machines
+  azure_rm_virtualmachine:
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ item.name }}"
+    vm_size: "{{ item.vm_size | default(azure_default_vm_size) }}"
+    location: "{{ azure_default_location }}"
+    storage_account: "{{ azure_storage_account }}"
+    admin_username: "{{ azure_vm_admin_username }}"
+    ssh_password_enabled: false
+    #virtual_network_name: "{{ azure_virtual_network }}"
+    network_interfaces: "{{ item.virtual_interface }}"
+    tags: "{{ item.tags | default({}) }}"
+    ssh_public_keys:
+      - path: "/home/{{ azure_vm_admin_username }}/.ssh/authorized_keys"
+        key_data: "{{ azure_vm_admin_ssh_key}}"
+    image:
+      offer: "{{ azure_vm_image.offer }}"
+      publisher: "{{ azure_vm_image.publisher }}"
+      sku: "{{ azure_vm_image.sku }}"
+      version: "{{ azure_vm_image.version }}"
+  with_items: "{{ azure_virtual_machines }}"

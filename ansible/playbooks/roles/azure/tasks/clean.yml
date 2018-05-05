@@ -1,0 +1,45 @@
+---
+
+- name: Delete virtual machines
+  azure_rm_virtualmachine:
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ item.name }}"
+    state: absent
+  with_items: "{{ azure_virtual_machines }}"
+  ignore_errors: yes
+
+- name: Delete security group that allows SSH "{{ azure_security_group }}"
+  azure_rm_securitygroup:
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ azure_security_group }}"
+    state: absent
+  ignore_errors: yes
+
+- name: Delete subnet "{{ azure_subnet }}"
+  azure_rm_subnet:
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ azure_subnet }}"
+    virtual_network: "{{ azure_virtual_network }}"
+    state: absent
+  ignore_errors: yes
+
+- name: Delete virtual network "{{ azure_virtual_network }}"
+  azure_rm_virtualnetwork:
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ azure_virtual_network }}"
+    state: absent
+  ignore_errors: yes
+
+- name: Delete storage account "{{ azure_storage_account }}"
+  azure_rm_storageaccount:
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ azure_storage_account }}"
+    state: absent
+  ignore_errors: yes
+
+- name: Delete a resource group "{{ azure_resource_group }}"
+  azure_rm_resourcegroup:
+    name: "{{ azure_resource_group }}"
+    state: absent
+    force: yes
+  ignore_errors: yes
