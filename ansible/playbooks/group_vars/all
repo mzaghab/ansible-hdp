@@ -74,8 +74,11 @@ ambari_db:
   password: ambari_pwd
   db_script: Ambari-DDL-MySQL-CREATE-2.6.1.5.sql
 
-cluster_name: "cluster_hdp"
-# blueprint_name: "my_blueprint"
+cluster_name: "my_cluster"
+blueprint_name: "my_blueprint" 
+blueprint_config_recommendation_strategy: "NEVER_APPLY"
+blueprint_default_password: "nopassword"
+blueprint_security: "no"
 
 ###################### ZOOKEEPER ######################
 zk_log_dir: "/var/log/zookeeper"
