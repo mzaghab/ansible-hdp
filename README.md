@@ -37,7 +37,7 @@ or
 `tenant=xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
 
 ## AZURE PROVISIONNING VIA ANSIBLE
-to launch the provisionning of the azure instances :
+- to launch the provisionning of the azure instances :
 
 `ansible-playbook -c localhost ansible/playbooks/build_cluster.yml `
 
@@ -45,25 +45,31 @@ Note : due to the ansible bug below (we must wait for the next release), Network
 
   https://github.com/ansible/ansible/issues/36093
 
-to clean the provisionning of the azure instances :
+- to clean the provisionning of the azure instances :
 
 `ansible-playbook -c localhost ansible/playbooks/site.yml -e azure_clean=True`
 
-test connectivity           : 
+# DEPLOY AN HDP CLUSTER
+
+- Test connectivity           : 
 
 `ansible -i ansible/inventories/azure_rm.py  -m ping all`
 
-Install init                : 
+- Install init                : 
 
-`ansible-playbook -i ansible/inventories/azure_rm.py ansible/playbooks/site.yml  --tags init`
+`ansible-playbook -i ansible/inventories/azure_rm.py ansible/playbooks/site.yml  --become --tags init`
 
-Install ambari server and agent: 
+- Install ambari server and agent: 
 
-`ansible-playbook -i ansible/inventories/azure_rm.py ansible/playbooks/site.yml --tags ambari`
+`ansible-playbook -i ansible/inventories/azure_rm.py ansible/playbooks/site.yml --become --tags ambari`
 
-Ambari UI   : http://192.168.162.101:8080/ 
+- Launch the cluster creation via blueprint: 
 
-## VAGRANT
+`ansible-playbook -i ansible/inventories/azure_rm.py ansible/playbooks/site.yml --tags blueprints`
+
+Ambari UI   : http://<ambari-host-external-ip>:8080/ 
+
+# VAGRANT (Deprecated see the azure part instead)
 launch :
 cd vagrant; ./setup.sh
 

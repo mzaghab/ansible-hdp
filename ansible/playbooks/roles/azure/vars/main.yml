@@ -4,7 +4,7 @@ azure_storage_account_type: "Standard_LRS"
 azure_default_location: "FranceCentral" # FranceCentral* northeurope or westeurope or FranceCentral
 azure_default_vm_size: "Standard_D2_v3"
 azure_vm_admin_username: "mounir"
-azure_vm_admin_ssh_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC+6UbxpyW5OLzvEW6OKHxx6X/VCXoCMNs2irhiBE9Gxf4Hziyzw7pRl1pYFr9wXdkte7zw0X5zc5PbTeWLEsrgFy22Kxkk2eTVIc6QEPuMGgk3+W/5LzSoSkW1oehwKEXVUvSHqO6ZATyUZs1dwLQqflp7X2K4a28IRPXkcQzCSh7OKtv2zQ6/IhvHGx2bf085Kn7iDvIYuYYabsJwblkexpkFqEwlNcgthhcdJW5Wgn3ZrmdaIJwf2grT0rybPN7x5W7Y6CtghypXJX7chGKz4ghwraFlccN9iv9aHznRj/8nKAmMyAcn/VnzvmF7j5jCyeecL+odjWyZxJy69XZN"
+azure_vm_admin_ssh_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
 
 # Cluster params
 azure_resource_group: "my-resource-group-hdp"

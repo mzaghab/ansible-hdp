@@ -1,8 +1,8 @@
 - hosts: hdp
   roles:
     - {role: ambari , tags: [hdp,ambari] }
+ #   - {role: blueprints , tags: [hdp,blueprints] }
 #    - {role: hdp-cluster , tags: [hdp,hdp-cluster] }
-#    - {role: blueprints , tags: [hdp,blueprints] }
 #    - {role: zookeeper ,    tags: [hdp,zookeeper] }
 #    - {role: hdfs ,         tags: [hdp,hdfs] }
 #    - {role: yarn ,         tags: [hdp,yarn] }
@@ -12,3 +12,7 @@
 #    - {role: hue ,          tags: [hdp,hue] }
 #    - {role: spark-on-yarn ,tags: [hdp,spark-on-yarn] }
 #    - {role: cdh-kerberos  ,tags: [hdp,hdp-kerberos] }
+
+- hosts: ambari-server
+  roles:
+    - {role: blueprints , tags: [hdp,blueprints] }

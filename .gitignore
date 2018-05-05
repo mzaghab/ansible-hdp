@@ -1,3 +1,5 @@
 .project
 .idea
 .pydevproject
+ansible/playbooks/site.retry
+
