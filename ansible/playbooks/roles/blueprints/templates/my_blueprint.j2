@@ -1,6 +1,26 @@
 {
   "configurations" : [
     {
+      "hdfs-logsearch-conf" : {
+        "properties_attributes" : { },
+        "properties" : {
+          "component_mappings" : "NAMENODE:hdfs_namenode;DATANODE:hdfs_datanode;SECONDARY_NAMENODE:hdfs_secondarynamenode;JOURNALNODE:hdfs_journalnode;ZKFC:hdfs_zkfc;NFS_GATEWAY:hdfs_nfs3",
+          "content" : "\n{\n  \"input\":[\n    {\n      \"type\":\"hdfs_datanode\",\n      \"rowtype\":\"service\",\n      \"path\":\"{{default('/configurations/hadoop-env/hdfs_log_dir_prefix', '/var/log/hadoop')}}/{{default('configurations/hadoop-env/hdfs_user', 'hdfs')}}/hadoop-{{default('configurations/hadoop-env/hdfs_user', 'hdfs')}}-datanode-*.log\"\n    },\n    {\n      \"type\":\"hdfs_namenode\",\n      \"rowtype\":\"service\",\n      \"path\":\"{{default('/configurations/hadoop-env/hdfs_log_dir_prefix', '/var/log/hadoop')}}/{{default('configurations/hadoop-env/hdfs_user', 'hdfs')}}/hadoop-{{default('configurations/hadoop-env/hdfs_user', 'hdfs')}}-namenode-*.log\"\n    },\n    {\n      \"type\":\"hdfs_journalnode\",\n      \"rowtype\":\"service\",\n      \"path\":\"{{default('/configurations/hadoop-env/hdfs_log_dir_prefix', '/var/log/hadoop')}}/{{default('configurations/hadoop-env/hdfs_user', 'hdfs')}}/hadoop-{{default('configurations/hadoop-env/hdfs_user', 'hdfs')}}-journalnode-*.log\"\n    },\n    {\n      \"type\":\"hdfs_secondarynamenode\",\n      \"rowtype\":\"service\",\n      \"path\":\"{{default('/configurations/hadoop-env/hdfs_log_dir_prefix', '/var/log/hadoop')}}/{{default('configurations/hadoop-env/hdfs_user', 'hdfs')}}/hadoop-{{default('configurations/hadoop-env/hdfs_user', 'hdfs')}}-secondarynamenode-*.log\"\n    },\n    {\n      \"type\":\"hdfs_zkfc\",\n      \"rowtype\":\"service\",\n      \"path\":\"{{default('/configurations/hadoop-env/hdfs_log_dir_prefix', '/var/log/hadoop')}}/{{default('configurations/hadoop-env/hdfs_user', 'hdfs')}}/hadoop-{{default('configurations/hadoop-env/hdfs_user', 'hdfs')}}-zkfc-*.log\"\n    },\n    {\n      \"type\":\"hdfs_nfs3\",\n      \"rowtype\":\"service\",\n      \"path\":\"{{default('/configurations/hadoop-env/hdfs_log_dir_prefix', '/var/log/hadoop')}}/{{default('configurations/hadoop-env/hdfs_user', 'hdfs')}}/hadoop-{{default('configurations/hadoop-env/hdfs_user', 'hdfs')}}-nfs3-*.log\"\n    },\n    {\n      \"type\":\"hdfs_audit\",\n      \"rowtype\":\"audit\",\n      \"is_enabled\":\"true\",\n      \"add_fields\":{\n        \"logType\":\"HDFSAudit\",\n        \"enforcer\":\"hadoop-acl\",\n        \"repoType\":\"1\",\n        \"repo\":\"hdfs\"\n      },\n      \"path\":\"{{default('/configurations/hadoop-env/hdfs_log_dir_prefix', '/var/log/hadoop')}}/{{default('configurations/hadoop-env/hdfs_user', 'hdfs')}}/hdfs-audit.log\"\n    }\n   ],\n  \"filter\":[\n    {\n      \"filter\":\"grok\",\n      \"conditions\":{\n        \"fields\":{\n          \"type\":[\n            \"hdfs_datanode\",\n            \"hdfs_journalnode\",\n            \"hdfs_secondarynamenode\",\n            \"hdfs_namenode\",\n            \"hdfs_zkfc\",\n            \"hdfs_nfs3\"\n          ]\n         }\n       },\n      \"log4j_format\":\"%d{ISO8601} %-5p %c{2} (%F:%M(%L)) - %m%n\",\n      \"multiline_pattern\":\"^(%{TIMESTAMP_ISO8601:logtime})\",\n      \"message_pattern\":\"(?m)^%{TIMESTAMP_ISO8601:logtime}%{SPACE}%{LOGLEVEL:level}%{SPACE}%{JAVACLASS:logger_name}%{SPACE}\\\\(%{JAVAFILE:file}:%{JAVAMETHOD:method}\\\\(%{INT:line_number}\\\\)\\\\)%{SPACE}-%{SPACE}%{GREEDYDATA:log_message}\",\n      \"post_map_values\":{\n        \"logtime\":{\n          \"map_date\":{\n            \"target_date_pattern\":\"yyyy-MM-dd HH:mm:ss,SSS\"\n          }\n        }\n       }\n     },\n    {\n      \"filter\":\"grok\",\n      \"conditions\":{\n        \"fields\":{\n          \"type\":[\n            \"hdfs_audit\"\n          ]\n         }\n       },\n      \"log4j_format\":\"%d{ISO8601} %-5p %c{2} (%F:%M(%L)) - %m%n\",\n      \"multiline_pattern\":\"^(%{TIMESTAMP_ISO8601:evtTime})\",\n      \"message_pattern\":\"(?m)^%{TIMESTAMP_ISO8601:evtTime}%{SPACE}%{LOGLEVEL:level}%{SPACE}%{JAVACLASS:logger_name}:%{SPACE}%{GREEDYDATA:log_message}\",\n      \"post_map_values\":{\n        \"evtTime\":{\n          \"map_date\":{\n            \"target_date_pattern\":\"yyyy-MM-dd HH:mm:ss,SSS\"\n          }\n         }\n       }\n     },\n    {\n      \"filter\":\"keyvalue\",\n      \"sort_order\":1,\n      \"conditions\":{\n        \"fields\":{\n          \"type\":[\n            \"hdfs_audit\"\n          ]\n         }\n       },\n      \"source_field\":\"log_message\",\n      \"value_split\":\"=\",\n      \"field_split\":\"\\t\",\n      \"post_map_values\":{\n        \"src\":{\n          \"map_fieldname\":{\n            \"new_fieldname\":\"resource\"\n          }\n         },\n        \"ip\":{\n          \"map_fieldname\":{\n            \"new_fieldname\":\"cliIP\"\n          }\n         },\n        \"allowed\":[\n          {\n            \"map_fieldvalue\":{\n              \"pre_value\":\"true\",\n              \"post_value\":\"1\"\n            }\n           },\n          {\n            \"map_fieldvalue\":{\n              \"pre_value\":\"false\",\n              \"post_value\":\"0\"\n            }\n           },\n          {\n            \"map_fieldname\":{\n              \"new_fieldname\":\"result\"\n            }\n           }\n         ],\n        \"cmd\":{\n          \"map_fieldname\":{\n            \"new_fieldname\":\"action\"\n          }\n         },\n        \"proto\":{\n          \"map_fieldname\":{\n            \"new_fieldname\":\"cliType\"\n          }\n         },\n        \"callerContext\":{\n          \"map_fieldname\":{\n            \"new_fieldname\":\"req_caller_id\"\n          }\n         }\n       }\n     },\n    {\n      \"filter\":\"grok\",\n      \"sort_order\":2,\n      \"source_field\":\"ugi\",\n      \"remove_source_field\":\"false\",\n      \"conditions\":{\n        \"fields\":{\n          \"type\":[\n            \"hdfs_audit\"\n          ]\n         }\n       },\n      \"message_pattern\":\"%{USERNAME:p_user}.+auth:%{USERNAME:p_authType}.+via %{USERNAME:k_user}.+auth:%{USERNAME:k_authType}|%{USERNAME:user}.+auth:%{USERNAME:authType}|%{USERNAME:x_user}\",\n      \"post_map_values\":{\n        \"user\":{\n          \"map_fieldname\":{\n            \"new_fieldname\":\"reqUser\"\n          }\n         },\n        \"x_user\":{\n          \"map_fieldname\":{\n            \"new_fieldname\":\"reqUser\"\n          }\n         },\n        \"p_user\":{\n          \"map_fieldname\":{\n            \"new_fieldname\":\"reqUser\"\n          }\n         },\n        \"k_user\":{\n          \"map_fieldname\":{\n            \"new_fieldname\":\"proxyUsers\"\n          }\n         },\n        \"p_authType\":{\n          \"map_fieldname\":{\n            \"new_fieldname\":\"authType\"\n          }\n         },\n        \"k_authType\":{\n          \"map_fieldname\":{\n            \"new_fieldname\":\"proxyAuthType\"\n          }\n         }\n       }\n     }\n   ]\n }",
+          "service_name" : "HDFS"
+        }
+      }
+    },
+    {
+      "hive-logsearch-conf" : {
+        "properties_attributes" : { },
+        "properties" : {
+          "component_mappings" : "HIVE_METASTORE:hive_metastore;HIVE_SERVER:hive_hiveserver2;WEBHCAT_SERVER:webhcat_server",
+          "content" : "\n{\n  \"input\":[\n    {\n      \"type\":\"hive_hiveserver2\",\n      \"rowtype\":\"service\",\n      \"path\":\"{{default('/configurations/hive-env/hive_log_dir', '/var/log/hive')}}/hiveserver2.log\"\n    },\n    {\n      \"type\":\"hive_metastore\",\n      \"rowtype\":\"service\",\n      \"path\":\"{{default('/configurations/hive-env/hive_log_dir', '/var/log/hive')}}/hivemetastore.log\"\n    },\n    {\n      \"type\": \"webhcat_server\",\n      \"rowntype\":\"service\",\n      \"path\":\"{{default('configurations/hive-env/hcat_log_dir', '/var/log/webhcat')}}/webhcat.log\"\n    }\n  ],\n  \"filter\":[\n    {\n      \"filter\":\"grok\",\n      \"conditions\":{\n        \"fields\":{\n          \"type\":[\n            \"hive_hiveserver2\",\n            \"hive_metastore\"\n          ]\n         }\n       },\n      \"log4j_format\":\"%d{ISO8601} %-5p [%t]: %c{2} (%F:%M(%L)) - %m%n\",\n      \"multiline_pattern\":\"^(%{TIMESTAMP_ISO8601:logtime})\",\n      \"message_pattern\":\"(?m)^%{TIMESTAMP_ISO8601:logtime}%{SPACE}%{LOGLEVEL:level}%{SPACE}\\\\[%{DATA:thread_name}\\\\]:%{SPACE}%{JAVACLASS:logger_name}%{SPACE}\\\\(%{JAVAFILE:file}:%{JAVAMETHOD:method}\\\\(%{INT:line_number}\\\\)\\\\)%{SPACE}-%{SPACE}%{GREEDYDATA:log_message}\",\n      \"post_map_values\":{\n        \"logtime\":{\n          \"map_date\":{\n            \"target_date_pattern\":\"yyyy-MM-dd HH:mm:ss,SSS\"\n          }\n         }\n       }\n     },\n    {\n      \"filter\":\"grok\",\n      \"conditions\":{\n        \"fields\":{\n          \"type\":[\n            \"webhcat_server\"\n          ]\n         }\n       },\n      \"log4j_format\":\" %-5p | %d{DATE} | %c | %m%n\",\n      \"multiline_pattern\":\"^(%{SPACE}%{LOGLEVEL:level}%{CUSTOM_SEPARATOR}%{CUSTOM_DATESTAMP:logtime})\",\n      \"message_pattern\":\"(?m)^%{SPACE}%{LOGLEVEL:level}%{CUSTOM_SEPARATOR}%{CUSTOM_DATESTAMP:logtime}%{CUSTOM_SEPARATOR}%{JAVACLASS:file}%{CUSTOM_SEPARATOR}%{GREEDYDATA:log_message}\",\n      \"post_map_values\":{\n        \"logtime\":{\n          \"map_date\":{\n            \"target_date_pattern\":\"dd MMM yyyy HH:mm:ss,SSS\"\n          }\n         },\n        \"level\":{\n           \"map_fieldvalue\":{\n             \"pre_value\":\"WARNING\",\n             \"post_value\":\"WARN\"\n            }\n        }\n       }\n     }\n   ]\n }",
+          "service_name" : "Hive"
+        }
+      }
+    },
+    {
       "zoo.cfg" : {
         "properties_attributes" : { },
         "properties" : {
@@ -42,6 +62,16 @@
           "hive2_log_maxfilesize" : "256",
           "hive2_log_maxbackupindex" : "30",
           "content" : "\n# Licensed to the Apache Software Foundation (ASF) under one\n# or more contributor license agreements.  See the NOTICE file\n# distributed with this work for additional information\n# regarding copyright ownership.  The ASF licenses this file\n# to you under the Apache License, Version 2.0 (the\n# \"License\"); you may not use this file except in compliance\n# with the License.  You may obtain a copy of the License at\n#\n#     http://www.apache.org/licenses/LICENSE-2.0\n#\n# Unless required by applicable law or agreed to in writing, software\n# distributed under the License is distributed on an \"AS IS\" BASIS,\n# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n# See the License for the specific language governing permissions and\n# limitations under the License.\n\nstatus = INFO\nname = HiveLog4j2\npackages = org.apache.hadoop.hive.ql.log\n\n# list of properties\nproperty.hive.log.level = {{hive_log_level}}\nproperty.hive.root.logger = DRFA\nproperty.hive.log.dir = ${sys:java.io.tmpdir}/${sys:user.name}\nproperty.hive.log.file = hive.log\nproperty.hive.perflogger.log.level = INFO\n\n# list of all appenders\nappenders = console, DRFA\n\n# console appender\nappender.console.type = Console\nappender.console.name = console\nappender.console.target = SYSTEM_ERR\nappender.console.layout.type = PatternLayout\nappender.console.layout.pattern = %d{ISO8601} %5p [%t] %c{2}: %m%n\n\n# daily rolling file appender\nappender.DRFA.type = RollingRandomAccessFile\nappender.DRFA.name = DRFA\nappender.DRFA.fileName = ${sys:hive.log.dir}/${sys:hive.log.file}\n# Use %pid in the filePattern to append process-id@host-name to the filename if you want separate log files for different CLI session\nappender.DRFA.filePattern = ${sys:hive.log.dir}/${sys:hive.log.file}.%d{yyyy-MM-dd}\nappender.DRFA.layout.type = PatternLayout\nappender.DRFA.layout.pattern = %d{ISO8601} %5p [%t] %c{2}: %m%n\nappender.DRFA.policies.type = Policies\nappender.DRFA.policies.time.type = TimeBasedTriggeringPolicy\nappender.DRFA.policies.time.interval = 1\nappender.DRFA.policies.time.modulate = true\nappender.DRFA.strategy.type = DefaultRolloverStrategy\nappender.DRFA.strategy.max = {{hive2_log_maxbackupindex}}\nappender.DRFA.policies.fsize.type = SizeBasedTriggeringPolicy\nappender.DRFA.policies.fsize.size = {{hive2_log_maxfilesize}}MB\n\n# list of all loggers\nloggers = NIOServerCnxn, ClientCnxnSocketNIO, DataNucleus, Datastore, JPOX, PerfLogger, AmazonAws, ApacheHttp\n\nlogger.NIOServerCnxn.name = org.apache.zookeeper.server.NIOServerCnxn\nlogger.NIOServerCnxn.level = WARN\n\nlogger.ClientCnxnSocketNIO.name = org.apache.zookeeper.ClientCnxnSocketNIO\nlogger.ClientCnxnSocketNIO.level = WARN\n\nlogger.DataNucleus.name = DataNucleus\nlogger.DataNucleus.level = ERROR\n\nlogger.Datastore.name = Datastore\nlogger.Datastore.level = ERROR\n\nlogger.JPOX.name = JPOX\nlogger.JPOX.level = ERROR\n\nlogger.AmazonAws.name=com.amazonaws\nlogger.AmazonAws.level = INFO\n\nlogger.ApacheHttp.name=org.apache.http\nlogger.ApacheHttp.level = INFO\n\nlogger.PerfLogger.name = org.apache.hadoop.hive.ql.log.PerfLogger\nlogger.PerfLogger.level = ${sys:hive.perflogger.log.level}\n\n# root logger\nrootLogger.level = ${sys:hive.log.level}\nrootLogger.appenderRefs = root\nrootLogger.appenderRef.root.ref = ${sys:hive.root.logger}"
+        }
+      }
+    },
+    {
+      "mapred-logsearch-conf" : {
+        "properties_attributes" : { },
+        "properties" : {
+          "component_mappings" : "HISTORYSERVER:mapred_historyserver",
+          "content" : "\n{\n  \"input\":[\n    {\n      \"type\":\"mapred_historyserver\",\n      \"rowtype\":\"service\",\n      \"path\":\"{{default('/configurations/mapred-env/mapred_log_dir_prefix', '/var/log/hadoop')}}/{{default('configurations/mapred-env/mapred_user', 'mapred')}}/mapred-{{default('configurations/mapred-env/mapred_user', 'mapred')}}-historyserver*.log\"\n    }\n   ],\n  \"filter\":[\n    {\n      \"filter\":\"grok\",\n      \"conditions\":{\n        \"fields\":{\n          \"type\":[\n            \"mapred_historyserver\"\n          ]\n         }\n       },\n      \"log4j_format\":\"%d{ISO8601} %-5p %c{2} (%F:%M(%L)) - %m%n\",\n      \"multiline_pattern\":\"^(%{TIMESTAMP_ISO8601:logtime})\",\n      \"message_pattern\":\"(?m)^%{TIMESTAMP_ISO8601:logtime}%{SPACE}%{LOGLEVEL:level}%{SPACE}%{JAVACLASS:logger_name}%{SPACE}\\\\(%{JAVAFILE:file}:%{JAVAMETHOD:method}\\\\(%{INT:line_number}\\\\)\\\\)%{SPACE}-%{SPACE}%{GREEDYDATA:log_message}\",\n      \"post_map_values\":{\n        \"logtime\":{\n          \"map_date\":{\n            \"target_date_pattern\":\"yyyy-MM-dd HH:mm:ss,SSS\"\n          }\n         }\n       }\n     }\n   ]\n }",
+          "service_name" : "MapReduce"
         }
       }
     },
@@ -107,7 +137,7 @@
           }
         },
         "properties" : {
-          "fs.defaultFS" : "hdfs://%HOSTGROUP::host_group_1%:8020",
+          "fs.defaultFS" : "hdfs://nameservice",
           "ipc.server.tcpnodelay" : "true",
           "mapreduce.jobtracker.webinterface.trusted" : "false",
           "hadoop.security.auth_to_local" : "DEFAULT",
@@ -133,6 +163,8 @@
           "io.compression.codecs" : "org.apache.hadoop.io.compress.GzipCodec,org.apache.hadoop.io.compress.DefaultCodec,org.apache.hadoop.io.compress.SnappyCodec",
           "hadoop.custom-extensions.root" : "/hdp/ext/{{major_stack_version}}/hadoop",
           "hadoop.proxyuser.hive.groups" : "*",
+          "hadoop.proxyuser.yarn.hosts" : "%HOSTGROUP::host_group_1%,%HOSTGROUP::host_group_2%",
+          "ha.zookeeper.quorum" : "%HOSTGROUP::host_group_1%:2181,%HOSTGROUP::host_group_2%:2181,%HOSTGROUP::host_group_3%:2181",
           "io.serializations" : "org.apache.hadoop.io.serializer.WritableSerialization"
         }
       }
@@ -249,7 +281,7 @@
           "gateway.host" : "embedded",
           "server.port" : "9000",
           "server.tmp.dir" : "/var/lib/smartsense/hst-server/tmp",
-          "server.url" : "http://myhost-hdp-01:9000",
+          "server.url" : "http://myhost-hdp-03:9000",
           "customer.smartsense.id" : "unspecified"
         }
       }
@@ -259,6 +291,16 @@
         "properties_attributes" : { },
         "properties" : {
           "content" : "\n# Licensed to the Apache Software Foundation (ASF) under one\n# or more contributor license agreements.  See the NOTICE file\n# distributed with this work for additional information\n# regarding copyright ownership.  The ASF licenses this file\n# to you under the Apache License, Version 2.0 (the\n# \"License\"); you may not use this file except in compliance\n# with the License.  You may obtain a copy of the License at\n#\n#     http://www.apache.org/licenses/LICENSE-2.0\n#\n# Unless required by applicable law or agreed to in writing, software\n# distributed under the License is distributed on an \"AS IS\" BASIS,\n# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n# See the License for the specific language governing permissions and\n# limitations under the License.\n\nstatus = INFO\nname = BeelineLog4j2\npackages = org.apache.hadoop.hive.ql.log\n\n# list of properties\nproperty.hive.log.level = {{hive_log_level}}\nproperty.hive.root.logger = console\n\n# list of all appenders\nappenders = console\n\n# console appender\nappender.console.type = Console\nappender.console.name = console\nappender.console.target = SYSTEM_ERR\nappender.console.layout.type = PatternLayout\nappender.console.layout.pattern = %d{yy/MM/dd HH:mm:ss} [%t]: %p %c{2}: %m%n\n\n# list of all loggers\nloggers = HiveConnection\n\n# HiveConnection logs useful info for dynamic service discovery\nlogger.HiveConnection.name = org.apache.hive.jdbc.HiveConnection\nlogger.HiveConnection.level = INFO\n\n# root logger\nrootLogger.level = ${sys:hive.log.level}\nrootLogger.appenderRefs = root\nrootLogger.appenderRef.root.ref = ${sys:hive.root.logger}"
+        }
+      }
+    },
+    {
+      "spark2-logsearch-conf" : {
+        "properties_attributes" : { },
+        "properties" : {
+          "component_mappings" : "SPARK2_JOBHISTORYSERVER:spark2_jobhistory_server;SPARK2_THRIFTSERVER:spark2_thriftserver;LIVY2_SERVER:livy2_server",
+          "content" : "\n{\n   \"input\":[\n      {\n       \"type\":\"spark2_jobhistory_server\",\n       \"rowtype\":\"service\",\n       \"path\":\"{{default('/configurations/spark2-env/spark_log_dir', '/var/log/spark2')}}/spark-*-org.apache.spark.deploy.history.HistoryServer*.out\"\n     },\n     {\n       \"type\":\"spark2_thriftserver\",\n       \"rowtype\":\"service\",\n       \"path\":\"{{default('/configurations/spark2-env/spark_log_dir', '/var/log/spark2')}}/spark-*-org.apache.spark.sql.hive.thriftserver.HiveThriftServer2*.out\"\n     },\n     {\n       \"type\":\"livy2_server\",\n       \"rowtype\":\"service\",\n       \"path\":\"{{default('/configurations/livy2-env/livy2_log_dir', '/var/log/livy2')}}/livy-livy-server.out\"\n     }\n   ],\n   \"filter\":[\n      {\n          \"filter\":\"grok\",\n          \"conditions\":{\n            \"fields\":{\n              \"type\":[\n                \"spark2_jobhistory_server\",\n                \"spark2_thriftserver\",\n                \"livy2_server\"\n              ]\n             }\n          },\n          \"log4j_format\":\"\",\n          \"multiline_pattern\":\"^(%{SPARK_DATESTAMP:logtime}%{SPACE}%{LOGLEVEL:level})\",\n          \"message_pattern\":\"(?m)^%{SPARK_DATESTAMP:logtime}%{SPACE}%{LOGLEVEL:level}%{SPACE}%{JAVAFILE:file}:%{SPACE}%{GREEDYDATA:log_message}\",\n          \"post_map_values\":{\n            \"logtime\":{\n              \"map_date\":{\n                \"target_date_pattern\":\"yy/MM/dd HH:mm:ss\"\n              }\n             },\n            \"level\":{\n              \"map_fieldvalue\":{\n                \"pre_value\":\"WARNING\",\n                \"post_value\":\"WARN\"\n              }\n             }\n           }\n      }\n   ]\n}",
+          "service_name" : "Spark2"
         }
       }
     },
@@ -819,6 +861,16 @@
       }
     },
     {
+      "ams-logsearch-conf" : {
+        "properties_attributes" : { },
+        "properties" : {
+          "component_mappings" : "METRICS_COLLECTOR:ams_collector,ams_hbase_master,ams_hbase_regionserver;METRICS_MONITOR:ams_monitor;METRICS_GRAFANA:ams_grafana",
+          "content" : "\n{\n  \"input\":[\n    {\n      \"type\":\"ams_hbase_master\",\n      \"rowtype\":\"service\",\n      \"path\":\"{{default('/configurations/ams-env/metrics_collector_log_dir', '/var/log/ambari-metrics-collector')}}/hbase-ams-master-*.log\"\n    },\n    {\n      \"type\":\"ams_hbase_regionserver\",\n      \"rowtype\":\"service\",\n      \"path\":\"{{default('/configurations/ams-env/metrics_collector_log_dir', '/var/log/ambari-metrics-collector')}}/hbase-ams-regionserver-*.log\"\n    },\n    {\n      \"type\":\"ams_collector\",\n      \"rowtype\":\"service\",\n      \"path\":\"{{default('/configurations/ams-env/metrics_collector_log_dir', '/var/log/ambari-metrics-collector')}}/ambari-metrics-collector.log\"\n    },\n    {\n      \"type\":\"ams_monitor\",\n      \"rowtype\":\"service\",\n      \"path\":\"{{default('/configurations/ams-env/metrics_monitor_log_dir', '/var/log/ambari-metrics-monitor')}}/ambari-metrics-monitor.out\"\n    },\n    {\n      \"type\":\"ams_grafana\",\n      \"rowtype\":\"service\",\n      \"path\":\"{{default('/configurations/ams-grafana-env/metrics_grafana_log_dir', '/var/log/ambari-metrics-grafana')}}/grafana.log\"\n    }\n  ],\n  \"filter\":[\n    {\n      \"filter\":\"grok\",\n      \"conditions\":{\n        \"fields\":{\n          \"type\":[\n            \"ams_collector\"\n          ]\n         }\n       },\n      \"log4j_format\":\"%d{ISO8601} %p %c: %m%n\",\n      \"multiline_pattern\":\"^(%{TIMESTAMP_ISO8601:logtime})\",\n      \"message_pattern\":\"(?m)^%{TIMESTAMP_ISO8601:logtime}%{SPACE}%{LOGLEVEL:level}%{SPACE}%{JAVACLASS:logger_name}:%{SPACE}%{GREEDYDATA:log_message}\",\n      \"post_map_values\":{\n        \"logtime\":{\n          \"map_date\":{\n            \"target_date_pattern\":\"yyyy-MM-dd HH:mm:ss,SSS\"\n          }\n         }\n       }\n     },\n    {\n      \"filter\":\"grok\",\n      \"conditions\":{\n        \"fields\":{\n          \"type\":[\n            \"ams_hbase_master\",\n            \"ams_hbase_regionserver\"\n          ]\n         }\n       },\n      \"log4j_format\":\"%d{ISO8601} %-5p [%t] %c{2}: %m%n\",\n      \"multiline_pattern\":\"^(%{TIMESTAMP_ISO8601:logtime})\",\n      \"message_pattern\":\"(?m)^%{TIMESTAMP_ISO8601:logtime}%{SPACE}%{LOGLEVEL:level}%{SPACE}\\\\[%{DATA:thread_name}\\\\]%{SPACE}%{JAVACLASS:logger_name}:%{SPACE}%{GREEDYDATA:log_message}\",\n      \"post_map_values\":{\n        \"logtime\":{\n          \"map_date\":{\n            \"target_date_pattern\":\"yyyy-MM-dd HH:mm:ss,SSS\"\n          }\n         }\n       }\n     },\n    {\n      \"filter\":\"grok\",\n      \"conditions\":{\n        \"fields\":{\n          \"type\":[\n            \"ams_grafana\"\n          ]\n         }\n       },\n      \"log4j_format\":\"%d{ISO8601} %-5p [%t] %c{2}: %m%n\",\n      \"multiline_pattern\":\"^(%{DATESTAMP:logtime})\",\n      \"message_pattern\":\"(?m)^%{DATESTAMP:logtime}%{SPACE}\\\\[%{WORD:level}\\\\]%{SPACE}%{GREEDYDATA:log_message}\",\n      \"post_map_values\":{\n        \"logtime\":{\n          \"map_date\":{\n            \"target_date_pattern\":\"yyyy/MM/dd HH:mm:ss\"\n          }\n         },\n        \"level\":[\n          {\n            \"map_fieldvalue\":{\n              \"pre_value\":\"I\",\n              \"post_value\":\"INFO\"\n            }\n          },\n          {\n            \"map_fieldvalue\":{\n              \"pre_value\":\"W\",\n              \"post_value\":\"WARN\"\n            }\n          },\n          {\n            \"map_fieldvalue\":{\n              \"pre_value\":\"D\",\n              \"post_value\":\"DEBUG\"\n             }\n           },\n           {\n             \"map_fieldvalue\":{\n               \"pre_value\":\"E\",\n               \"post_value\":\"ERROR\"\n             }\n           },\n           {\n             \"map_fieldvalue\":{\n               \"pre_value\":\"F\",\n               \"post_value\":\"FATAL\"\n             }\n           }\n         ]\n       }\n     },\n    {\n      \"filter\":\"grok\",\n      \"conditions\":{\n        \"fields\":{\n          \"type\":[\n            \"ams_monitor\"\n          ]\n        }\n      },\n      \"log4j_format\":\"\",\n      \"multiline_pattern\":\"^(%{TIMESTAMP_ISO8601:logtime})\",\n      \"message_pattern\":\"(?m)^%{TIMESTAMP_ISO8601:logtime}%{SPACE}\\\\[%{LOGLEVEL:level}\\\\]%{SPACE}%{JAVAFILE:file}:%{INT:line_number}%{SPACE}-%{SPACE}%{GREEDYDATA:log_message}\",\n      \"post_map_values\":{\n        \"logtime\":{\n          \"map_date\":{\n            \"target_date_pattern\":\"yyyy-MM-dd HH:mm:ss,SSS\"\n          }\n         }\n       },\n      \"level\":[\n        {\n          \"map_fieldvalue\":{\n            \"pre_value\":\"WARNING\",\n            \"post_value\":\"WARN\"\n          }\n        }\n      ]\n     }\n   ]\n }",
+          "service_name" : "AMS"
+        }
+      }
+    },
+    {
       "ranger-yarn-policymgr-ssl" : {
         "properties_attributes" : { },
         "properties" : { }
@@ -831,10 +883,20 @@
       }
     },
     {
+      "zookeeper-logsearch-conf" : {
+        "properties_attributes" : { },
+        "properties" : {
+          "component_mappings" : "ZOOKEEPER_SERVER:zookeeper",
+          "content" : "\n{\n  \"input\":[\n    {\n     \"type\":\"zookeeper\",\n     \"rowtype\":\"service\",\n     \"path\":\"{{default('/configurations/zookeeper-env/zk_log_dir', '/var/log/zookeeper')}}/zookeeper*.log\"\n    }\n  ],\n  \"filter\":[\n   {\n      \"filter\":\"grok\",\n      \"conditions\":{\n        \"fields\":{\"type\":[\"zookeeper\"]}\n      },\n     \"log4j_format\":\"%d{ISO8601} - %-5p [%t:%C{1}@%L] - %m%n\",\n     \"multiline_pattern\":\"^(%{TIMESTAMP_ISO8601:logtime})\",\n     \"message_pattern\":\"(?m)^%{TIMESTAMP_ISO8601:logtime}%{SPACE}-%{SPACE}%{LOGLEVEL:level}%{SPACE}\\\\[%{DATA:thread_name}\\\\@%{INT:line_number}\\\\]%{SPACE}-%{SPACE}%{GREEDYDATA:log_message}\",\n     \"post_map_values\": {\n       \"logtime\": {\n         \"map_date\":{\n           \"target_date_pattern\":\"yyyy-MM-dd HH:mm:ss,SSS\"\n         }\n       }\n     }\n    }\n   ]\n}",
+          "service_name" : "Zookeeper"
+        }
+      }
+    },
+    {
       "hcat-env" : {
         "properties_attributes" : { },
         "properties" : {
-          "content" : "\n      # Licensed to the Apache Software Foundation (ASF) under one\n      # or more contributor license agreements. See the NOTICE file\n      # distributed with this work for additional information\n      # regarding copyright ownership. The ASF licenses this file\n      # to you under the Apache License, Version 2.0 (the\n      # \"License\"); you may not use this file except in compliance\n      # with the License. You may obtain a copy of the License at\n      #\n      # http://www.apache.org/licenses/LICENSE-2.0\n      #\n      # Unless required by applicable law or agreed to in writing, software\n      # distributed under the License is distributed on an \"AS IS\" BASIS,\n      # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n      # See the License for the specific language governing permissions and\n      # limitations under the License.\n\n      JAVA_HOME={{java_home}}\n      HCAT_PID_DIR={{hcat_pid_dir}}/\n      HCAT_LOG_DIR={{hcat_log_dir}}/\n      HCAT_CONF_DIR={{hcat_conf_dir}}\n      HADOOP_HOME=${HADOOP_HOME:-{{hadoop_home}}}\n      #DBROOT is the path where the connector jars are downloaded\n      DBROOT={{hcat_dbroot}}\n      USER={{hcat_user}}\n      METASTORE_PORT={{hive_metastore_port}}"
+          "content" : "\n      # Licensed to the Apache Software Foundation (ASF) under one\n      # or more contributor license agreements. See the NOTICE file\n      # distributed with this work for additional information\n      # regarding copyright ownership. The ASF licenses this file\n      # to you under the Apache License, Version 2.0 (the\n      # \"License\"); you may not use this file except in compliance\n      # with the License. You may obtain a copy of the License at\n      #\n      # http://www.apache.org/licenses/LICENSE-2.0\n      #\n      # Unless required by applicable law or agreed to in writing, software\n      # distributed under the License is distributed on an \"AS IS\" BASIS,\n      # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n      # See the License for the specific language governing permissions and\n      # limitations under the License.\n\n      JAVA_HOME={{java64_home}}\n      HCAT_PID_DIR={{hcat_pid_dir}}/\n      HCAT_LOG_DIR={{hcat_log_dir}}/\n      HCAT_CONF_DIR={{hcat_conf_dir}}\n      HADOOP_HOME=${HADOOP_HOME:-{{hadoop_home}}}\n      #DBROOT is the path where the connector jars are downloaded\n      DBROOT={{hcat_dbroot}}\n      USER={{hcat_user}}\n      METASTORE_PORT={{hive_metastore_port}}"
         }
       }
     },
@@ -980,16 +1042,19 @@
           }
         },
         "properties" : {
+          "dfs.namenode.https-address.nameservice.nn1" : "%HOSTGROUP::host_group_1%:50470",
+          "dfs.namenode.https-address.nameservice.nn2" : "%HOSTGROUP::host_group_2%:50470",
           "dfs.replication" : "3",
           "dfs.namenode.audit.log.async" : "true",
+          "dfs.nameservices" : "nameservice",
           "dfs.namenode.checkpoint.dir" : "/hadoop/hdfs/namesecondary",
           "dfs.namenode.avoid.read.stale.datanode" : "true",
           "manage.include.files" : "false",
           "dfs.journalnode.http-address" : "0.0.0.0:8480",
           "nfs.file.dump.dir" : "/tmp/.hdfs-nfs",
-          "dfs.namenode.rpc-address" : "%HOSTGROUP::host_group_1%:8020",
-          "dfs.namenode.https-address" : "%HOSTGROUP::host_group_1%:50470",
+          "dfs.internal.nameservices" : "nameservice",
           "dfs.encrypt.data.transfer.cipher.suites" : "AES/CTR/NoPadding",
+          "dfs.ha.namenodes.nameservice" : "nn1,nn2",
           "dfs.client.read.shortcircuit.streams.cache.size" : "4096",
           "dfs.hosts.exclude" : "/etc/hadoop/conf/dfs.exclude",
           "dfs.namenode.accesstime.precision" : "0",
@@ -997,8 +1062,10 @@
           "dfs.permissions.enabled" : "true",
           "dfs.datanode.balance.bandwidthPerSec" : "6250000",
           "dfs.namenode.stale.datanode.interval" : "30000",
+          "dfs.namenode.rpc-address.nameservice.nn2" : "%HOSTGROUP::host_group_2%:8020",
           "dfs.content-summary.limit" : "5000",
           "dfs.http.policy" : "HTTP_ONLY",
+          "dfs.ha.fencing.methods" : "shell(/bin/true)",
           "dfs.journalnode.https-address" : "0.0.0.0:8481",
           "dfs.datanode.du.reserved" : "6588526592",
           "dfs.domain.socket.path" : "/var/lib/hadoop-hdfs/dn_socket",
@@ -1006,14 +1073,16 @@
           "dfs.cluster.administrators" : " hdfs",
           "dfs.datanode.max.transfer.threads" : "4096",
           "dfs.namenode.handler.count" : "50",
+          "dfs.namenode.rpc-address.nameservice.nn1" : "%HOSTGROUP::host_group_1%:8020",
           "dfs.https.port" : "50470",
           "dfs.replication.max" : "50",
           "dfs.client.read.shortcircuit" : "true",
           "dfs.webhdfs.enabled" : "true",
-          "dfs.namenode.http-address" : "%HOSTGROUP::host_group_1%:50070",
           "dfs.namenode.name.dir" : "/hadoop/hdfs/namenode,/mnt/resource/hadoop/hdfs/namenode",
           "dfs.namenode.avoid.write.stale.datanode" : "true",
+          "dfs.namenode.http-address.nameservice.nn1" : "%HOSTGROUP::host_group_1%:50070",
           "dfs.datanode.https.address" : "0.0.0.0:50475",
+          "dfs.namenode.http-address.nameservice.nn2" : "%HOSTGROUP::host_group_2%:50070",
           "dfs.datanode.failed.volumes.tolerated" : "0",
           "dfs.client.retry.policy.enabled" : "false",
           "hadoop.caller.context.enabled" : "true",
@@ -1022,6 +1091,7 @@
           "dfs.datanode.data.dir" : "/hadoop/hdfs/data,/mnt/resource/hadoop/hdfs/data",
           "dfs.permissions.superusergroup" : "hdfs",
           "dfs.blocksize" : "134217728",
+          "dfs.namenode.shared.edits.dir" : "qjournal://%HOSTGROUP::host_group_2%:8485;%HOSTGROUP::host_group_1%:8485;%HOSTGROUP::host_group_3%:8485/nameservice",
           "dfs.namenode.checkpoint.edits.dir" : "${dfs.namenode.checkpoint.dir}",
           "nfs.exports.allowed.hosts" : "* rw",
           "dfs.datanode.address" : "0.0.0.0:50010",
@@ -1030,14 +1100,15 @@
           "dfs.namenode.write.stale.datanode.ratio" : "1.0f",
           "dfs.namenode.name.dir.restore" : "true",
           "dfs.heartbeat.interval" : "3",
-          "dfs.namenode.secondary.http-address" : "%HOSTGROUP::host_group_2%:50090",
           "dfs.namenode.checkpoint.txns" : "1000000",
-          "dfs.journalnode.edits.dir" : "/hadoop/hdfs/journalnode",
+          "dfs.journalnode.edits.dir" : "/hadoop/hdfs/journal",
           "dfs.support.append" : "true",
           "fs.permissions.umask-mode" : "022",
-          "dfs.namenode.safemode.threshold-pct" : "1",
+          "dfs.namenode.safemode.threshold-pct" : "0.99f",
           "dfs.namenode.checkpoint.period" : "21600",
-          "dfs.datanode.http.address" : "0.0.0.0:50075"
+          "dfs.datanode.http.address" : "0.0.0.0:50075",
+          "dfs.client.failover.proxy.provider.nameservice" : "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider",
+          "dfs.ha.automatic-failover.enabled" : "true"
         }
       }
     },
@@ -1046,10 +1117,10 @@
         "properties_attributes" : { },
         "properties" : {
           "yarn.log-aggregation.file-formats" : "IndexedFormat,TFile",
-          "yarn.resourcemanager.zk-address" : "%HOSTGROUP::host_group_1%:2181,%HOSTGROUP::host_group_3%:2181,%HOSTGROUP::host_group_2%:2181",
+          "yarn.resourcemanager.zk-address" : "%HOSTGROUP::host_group_1%:2181,%HOSTGROUP::host_group_2%:2181,%HOSTGROUP::host_group_3%:2181",
           "yarn.nodemanager.container-monitor.interval-ms" : "3000",
           "yarn.timeline-service.entity-group-fs-store.active-dir" : "/ats/active/",
-          "yarn.log.server.web-service.url" : "http://%HOSTGROUP::host_group_1%:8188/ws/v1/applicationhistory",
+          "yarn.log.server.web-service.url" : "http://%HOSTGROUP::host_group_3%:8188/ws/v1/applicationhistory",
           "yarn.nodemanager.linux-container-executor.group" : "hadoop",
           "yarn.client.failover-proxy-provider" : "org.apache.hadoop.yarn.client.RequestHedgingRMFailoverProxyProvider",
           "yarn.application.classpath" : "{{hadoop_home}}/conf,{{hadoop_home}}/*,{{hadoop_home}}/lib/*,/usr/hdp/current/hadoop-hdfs-client/*,/usr/hdp/current/hadoop-hdfs-client/lib/*,/usr/hdp/current/hadoop-yarn-client/*,/usr/hdp/current/hadoop-yarn-client/lib/*,/usr/hdp/current/ext/hadoop/*",
@@ -1061,17 +1132,22 @@
           "yarn.resourcemanager.webapp.address" : "%HOSTGROUP::host_group_1%:8088",
           "yarn.timeline-service.leveldb-timeline-store.ttl-interval-ms" : "300000",
           "yarn.scheduler.maximum-allocation-vcores" : "1",
-          "yarn.timeline-service.address" : "%HOSTGROUP::host_group_1%:10200",
+          "yarn.timeline-service.address" : "%HOSTGROUP::host_group_3%:10200",
+          "yarn.resourcemanager.cluster-id" : "yarn-cluster",
           "yarn.timeline-service.enabled" : "true",
           "yarn.nodemanager.aux-services" : "mapreduce_shuffle,spark_shuffle,spark2_shuffle",
           "yarn.nodemanager.resource.cpu-vcores" : "1",
           "yarn.resourcemanager.webapp.delegation-token-auth-filter.enabled" : "false",
           "yarn.nodemanager.aux-services.spark_shuffle.class" : "org.apache.spark.network.yarn.YarnShuffleService",
           "yarn.nodemanager.log-aggregation.debug-enabled" : "false",
+          "yarn.resourcemanager.hostname.rm2" : "%HOSTGROUP::host_group_2%",
+          "yarn.resourcemanager.hostname.rm1" : "%HOSTGROUP::host_group_1%",
           "yarn.resourcemanager.zk-acl" : "world:anyone:rwcda",
           "yarn.client.nodemanager-connect.max-wait-ms" : "60000",
           "yarn.http.policy" : "HTTP_ONLY",
           "yarn.timeline-service.http-authentication.simple.anonymous.allowed" : "true",
+          "yarn.resourcemanager.webapp.address.rm2" : "%HOSTGROUP::host_group_2%:8088",
+          "yarn.resourcemanager.webapp.address.rm1" : "%HOSTGROUP::host_group_1%:8088",
           "yarn.resourcemanager.zk-state-store.parent-path" : "/rmstore",
           "yarn.timeline-service.leveldb-timeline-store.start-time-read-cache-size" : "10000",
           "yarn.resourcemanager.admin.address" : "%HOSTGROUP::host_group_1%:8141",
@@ -1088,8 +1164,10 @@
           "yarn.node-labels.enabled" : "false",
           "yarn.nodemanager.kill-escape.user" : "hive",
           "yarn.resourcemanager.connect.max-wait.ms" : "-1",
+          "yarn.resourcemanager.webapp.https.address.rm2" : "%HOSTGROUP::host_group_2%:8090",
           "yarn.resourcemanager.zk-num-retries" : "1000",
           "yarn.scheduler.minimum-allocation-vcores" : "1",
+          "yarn.resourcemanager.webapp.https.address.rm1" : "%HOSTGROUP::host_group_1%:8090",
           "yarn.nodemanager.aux-services.spark2_shuffle.classpath" : "{{stack_root}}/${hdp.version}/spark2/aux/*",
           "yarn.resourcemanager.scheduler.class" : "org.apache.hadoop.yarn.server.resourcemanager.scheduler.capacity.CapacityScheduler",
           "yarn.resourcemanager.system-metrics-publisher.enabled" : "true",
@@ -1113,6 +1191,7 @@
           "yarn.timeline-service.entity-group-fs-store.group-id-plugin-classes" : "org.apache.tez.dag.history.logging.ats.TimelineCachePluginImpl,org.apache.spark.deploy.history.yarn.plugin.SparkATSPlugin",
           "yarn.resourcemanager.address" : "%HOSTGROUP::host_group_1%:8050",
           "yarn.timeline-service.recovery.enabled" : "true",
+          "yarn.resourcemanager.ha.automatic-failover.zk-base-path" : "/yarn-leader-election",
           "yarn.nodemanager.recovery.dir" : "{{yarn_log_dir_prefix}}/nodemanager/recovery-state",
           "yarn.resourcemanager.scheduler.monitor.enable" : "false",
           "hadoop.registry.rm.enabled" : "true",
@@ -1122,7 +1201,7 @@
           "yarn.resourcemanager.system-metrics-publisher.dispatcher.pool-size" : "10",
           "yarn.acl.enable" : "false",
           "manage.include.files" : "false",
-          "yarn.resourcemanager.ha.enabled" : "false",
+          "yarn.resourcemanager.ha.enabled" : "true",
           "yarn.timeline-service.entity-group-fs-store.app-cache-size" : "10",
           "yarn.client.nodemanager-connect.retry-interval-ms" : "10000",
           "yarn.timeline-service.version" : "1.5",
@@ -1146,8 +1225,9 @@
           "yarn.timeline-service.leveldb-state-store.path" : "/hadoop/yarn/timeline",
           "yarn.nodemanager.log.retain-seconds" : "604800",
           "yarn.timeline-service.entity-group-fs-store.done-dir" : "/ats/done/",
+          "yarn.resourcemanager.ha.rm-ids" : "rm1,rm2",
           "yarn.nodemanager.disk-health-checker.max-disk-utilization-per-disk-percentage" : "90",
-          "hadoop.registry.zk.quorum" : "%HOSTGROUP::host_group_1%:2181,%HOSTGROUP::host_group_3%:2181,%HOSTGROUP::host_group_2%:2181",
+          "hadoop.registry.zk.quorum" : "%HOSTGROUP::host_group_3%:2181,%HOSTGROUP::host_group_1%:2181,%HOSTGROUP::host_group_2%:2181",
           "yarn.nodemanager.log-aggregation.roll-monitoring-interval-seconds" : "3600",
           "yarn.nodemanager.container-executor.class" : "org.apache.hadoop.yarn.server.nodemanager.DefaultContainerExecutor",
           "yarn.resourcemanager.nodes.exclude-path" : "/etc/hadoop/conf/yarn.exclude",
@@ -1157,7 +1237,7 @@
           "yarn.resourcemanager.hostname" : "%HOSTGROUP::host_group_1%",
           "yarn.resourcemanager.monitor.capacity.preemption.total_preemption_per_round" : "0.2",
           "yarn.resourcemanager.connect.retry-interval.ms" : "15000",
-          "yarn.timeline-service.webapp.address" : "%HOSTGROUP::host_group_1%:8188",
+          "yarn.timeline-service.webapp.address" : "%HOSTGROUP::host_group_3%:8188",
           "yarn.scheduler.minimum-allocation-mb" : "1024",
           "yarn.timeline-service.entity-group-fs-store.summary-store" : "org.apache.hadoop.yarn.server.timeline.RollingLevelDBTimelineStore",
           "yarn.nodemanager.health-checker.interval-ms" : "135000",
@@ -1169,7 +1249,7 @@
           "yarn.nodemanager.vmem-check-enabled" : "false",
           "yarn.timeline-service.entity-group-fs-store.scan-interval-seconds" : "15",
           "yarn.resourcemanager.webapp.https.address" : "%HOSTGROUP::host_group_1%:8090",
-          "yarn.timeline-service.webapp.https.address" : "%HOSTGROUP::host_group_1%:8190",
+          "yarn.timeline-service.webapp.https.address" : "%HOSTGROUP::host_group_3%:8190",
           "yarn.nodemanager.resource.percentage-physical-cpu-limit" : "80",
           "yarn.nodemanager.vmem-pmem-ratio" : "2.1",
           "yarn.nodemanager.log-aggregation.compression-type" : "gz",
@@ -1211,6 +1291,16 @@
           "livy.impersonation.enabled" : "true",
           "livy.server.port" : "8998",
           "livy.server.recovery.state-store" : "filesystem"
+        }
+      }
+    },
+    {
+      "yarn-logsearch-conf" : {
+        "properties_attributes" : { },
+        "properties" : {
+          "component_mappings" : "RESOURCEMANAGER:yarn_resourcemanager,yarn_historyserver,yarn_jobsummary;NODEMANAGER:yarn_nodemanager;APP_TIMELINE_SERVER:yarn_timelineserver",
+          "content" : "\n{\n  \"input\":[\n    {\n      \"type\":\"yarn_nodemanager\",\n      \"rowtype\":\"service\",\n      \"path\":\"{{default('/configurations/yarn-env/yarn_log_dir_prefix', '/var/log/hadoop')}}/{{default('configurations/yarn-env/yarn_user', 'yarn')}}/yarn-{{default('configurations/yarn-env/yarn_user', 'yarn')}}-nodemanager-*.log\"\n    },\n    {\n      \"type\":\"yarn_resourcemanager\",\n      \"rowtype\":\"service\",\n      \"path\":\"{{default('/configurations/yarn-env/yarn_log_dir_prefix', '/var/log/hadoop')}}/{{default('configurations/yarn-env/yarn_user', 'yarn')}}/yarn-{{default('configurations/yarn-env/yarn_user', 'yarn')}}-resourcemanager-*.log\"\n    },\n    {\n      \"type\":\"yarn_timelineserver\",\n      \"rowtype\":\"service\",\n      \"path\":\"{{default('/configurations/yarn-env/yarn_log_dir_prefix', '/var/log/hadoop')}}/{{default('configurations/yarn-env/yarn_user', 'yarn')}}/yarn-{{default('configurations/yarn-env/yarn_user', 'yarn')}}-timelineserver-*.log\"\n    },\n    {\n      \"type\":\"yarn_historyserver\",\n      \"rowtype\":\"service\",\n      \"path\":\"{{default('/configurations/yarn-env/yarn_log_dir_prefix', '/var/log/hadoop')}}/{{default('configurations/yarn-env/yarn_user', 'yarn')}}/yarn-{{default('configurations/yarn-env/yarn_user', 'yarn')}}-historyserver-*.log\"\n    },\n    {\n      \"type\":\"yarn_jobsummary\",\n      \"rowtype\":\"service\",\n      \"path\":\"{{default('/configurations/yarn-env/yarn_log_dir_prefix', '/var/log/hadoop')}}/{{default('configurations/yarn-env/yarn_user', 'yarn')}}/hadoop-mapreduce.jobsummary.log\"\n    }\n   ],\n  \"filter\":[\n    {\n      \"filter\":\"grok\",\n      \"conditions\":{\n        \"fields\":{\n          \"type\":[\n            \"yarn_historyserver\",\n            \"yarn_jobsummary\",\n            \"yarn_nodemanager\",\n            \"yarn_resourcemanager\",\n            \"yarn_timelineserver\"\n          ]\n         }\n       },\n      \"log4j_format\":\"%d{ISO8601} %-5p %c{2} (%F:%M(%L)) - %m%n\",\n      \"multiline_pattern\":\"^(%{TIMESTAMP_ISO8601:logtime})\",\n      \"message_pattern\":\"(?m)^%{TIMESTAMP_ISO8601:logtime}%{SPACE}%{LOGLEVEL:level}%{SPACE}%{JAVACLASS:logger_name}%{SPACE}\\\\(%{JAVAFILE:file}:%{JAVAMETHOD:method}\\\\(%{INT:line_number}\\\\)\\\\)%{SPACE}-%{SPACE}%{GREEDYDATA:log_message}\",\n      \"post_map_values\":{\n        \"logtime\":{\n          \"map_date\":{\n            \"target_date_pattern\":\"yyyy-MM-dd HH:mm:ss,SSS\"\n          }\n         }\n       }\n     }\n   ]\n}",
+          "service_name" : "YARN"
         }
       }
     },
@@ -1259,7 +1349,7 @@
           "yarn_log_dir_prefix" : "/var/log/hadoop-yarn",
           "apptimelineserver_heapsize" : "8072",
           "yarn_user_nofile_limit" : "32768",
-          "content" : "\n      export HADOOP_YARN_HOME={{hadoop_yarn_home}}\n      export YARN_LOG_DIR={{yarn_log_dir_prefix}}/$USER\n      export YARN_PID_DIR={{yarn_pid_dir_prefix}}/$USER\n      export HADOOP_LIBEXEC_DIR={{hadoop_libexec_dir}}\n      export JAVA_HOME={{java_home}}\n      export JAVA_LIBRARY_PATH=\"${JAVA_LIBRARY_PATH}:{{hadoop_java_io_tmpdir}}\"\n\n      # We need to add the EWMA appender for the yarn daemons only;\n      # however, YARN_ROOT_LOGGER is shared by the yarn client and the\n      # daemons. This is restrict the EWMA appender to daemons only.\n      INVOKER=\"${0##*/}\"\n      if [ \"$INVOKER\" == \"yarn-daemon.sh\" ]; then\n        export YARN_ROOT_LOGGER=${YARN_ROOT_LOGGER:-INFO,EWMA,RFA}\n      fi\n\n      # User for YARN daemons\n      export HADOOP_YARN_USER=${HADOOP_YARN_USER:-yarn}\n\n      # resolve links - $0 may be a softlink\n      export YARN_CONF_DIR=\"${YARN_CONF_DIR:-$HADOOP_YARN_HOME/conf}\"\n\n      # some Java parameters\n      # export JAVA_HOME=/home/y/libexec/jdk1.6.0/\n      if [ \"$JAVA_HOME\" != \"\" ]; then\n      #echo \"run java in $JAVA_HOME\"\n      JAVA_HOME=$JAVA_HOME\n      fi\n\n      if [ \"$JAVA_HOME\" = \"\" ]; then\n      echo \"Error: JAVA_HOME is not set.\"\n      exit 1\n      fi\n\n      JAVA=$JAVA_HOME/bin/java\n      JAVA_HEAP_MAX=-Xmx1000m\n\n      # For setting YARN specific HEAP sizes please use this\n      # Parameter and set appropriately\n      YARN_HEAPSIZE={{yarn_heapsize}}\n\n      # check envvars which might override default args\n      if [ \"$YARN_HEAPSIZE\" != \"\" ]; then\n      JAVA_HEAP_MAX=\"-Xmx\"\"$YARN_HEAPSIZE\"\"m\"\n      fi\n\n      # Resource Manager specific parameters\n\n      # Specify the max Heapsize for the ResourceManager using a numerical value\n      # in the scale of MB. For example, to specify an jvm option of -Xmx1000m, set\n      # the value to 1000.\n      # This value will be overridden by an Xmx setting specified in either YARN_OPTS\n      # and/or YARN_RESOURCEMANAGER_OPTS.\n      # If not specified, the default value will be picked from either YARN_HEAPMAX\n      # or JAVA_HEAP_MAX with YARN_HEAPMAX as the preferred option of the two.\n      export YARN_RESOURCEMANAGER_HEAPSIZE={{resourcemanager_heapsize}}\n\n      # Specify the JVM options to be used when starting the ResourceManager.\n      # These options will be appended to the options specified as YARN_OPTS\n      # and therefore may override any similar flags set in YARN_OPTS\n      #export YARN_RESOURCEMANAGER_OPTS=\n\n      # Node Manager specific parameters\n\n      # Specify the max Heapsize for the NodeManager using a numerical value\n      # in the scale of MB. For example, to specify an jvm option of -Xmx1000m, set\n      # the value to 1000.\n      # This value will be overridden by an Xmx setting specified in either YARN_OPTS\n      # and/or YARN_NODEMANAGER_OPTS.\n      # If not specified, the default value will be picked from either YARN_HEAPMAX\n      # or JAVA_HEAP_MAX with YARN_HEAPMAX as the preferred option of the two.\n      export YARN_NODEMANAGER_HEAPSIZE={{nodemanager_heapsize}}\n\n      # Specify the max Heapsize for the timeline server using a numerical value\n      # in the scale of MB. For example, to specify an jvm option of -Xmx1000m, set\n      # the value to 1024.\n      # This value will be overridden by an Xmx setting specified in either YARN_OPTS\n      # and/or YARN_TIMELINESERVER_OPTS.\n      # If not specified, the default value will be picked from either YARN_HEAPMAX\n      # or JAVA_HEAP_MAX with YARN_HEAPMAX as the preferred option of the two.\n      export YARN_TIMELINESERVER_HEAPSIZE={{apptimelineserver_heapsize}}\n\n      # Specify the JVM options to be used when starting the NodeManager.\n      # These options will be appended to the options specified as YARN_OPTS\n      # and therefore may override any similar flags set in YARN_OPTS\n      #export YARN_NODEMANAGER_OPTS=\n\n      # so that filenames w/ spaces are handled correctly in loops below\n      IFS=\n\n\n      # default log directory and file\n      if [ \"$YARN_LOG_DIR\" = \"\" ]; then\n      YARN_LOG_DIR=\"$HADOOP_YARN_HOME/logs\"\n      fi\n      if [ \"$YARN_LOGFILE\" = \"\" ]; then\n      YARN_LOGFILE='yarn.log'\n      fi\n\n      # default policy file for service-level authorization\n      if [ \"$YARN_POLICYFILE\" = \"\" ]; then\n      YARN_POLICYFILE=\"hadoop-policy.xml\"\n      fi\n\n      # restore ordinary behaviour\n      unset IFS\n\n\n      YARN_OPTS=\"$YARN_OPTS -Dhadoop.log.dir=$YARN_LOG_DIR\"\n      YARN_OPTS=\"$YARN_OPTS -Dyarn.log.dir=$YARN_LOG_DIR\"\n      YARN_OPTS=\"$YARN_OPTS -Dhadoop.log.file=$YARN_LOGFILE\"\n      YARN_OPTS=\"$YARN_OPTS -Dyarn.log.file=$YARN_LOGFILE\"\n      YARN_OPTS=\"$YARN_OPTS -Dyarn.home.dir=$YARN_COMMON_HOME\"\n      YARN_OPTS=\"$YARN_OPTS -Dyarn.id.str=$YARN_IDENT_STRING\"\n      YARN_OPTS=\"$YARN_OPTS -Dhadoop.root.logger=${YARN_ROOT_LOGGER:-INFO,console}\"\n      YARN_OPTS=\"$YARN_OPTS -Dyarn.root.logger=${YARN_ROOT_LOGGER:-INFO,console}\"\n      export YARN_NODEMANAGER_OPTS=\"$YARN_NODEMANAGER_OPTS -Dnm.audit.logger=INFO,NMAUDIT\"\n      export YARN_RESOURCEMANAGER_OPTS=\"$YARN_RESOURCEMANAGER_OPTS -Drm.audit.logger=INFO,RMAUDIT\"\n      if [ \"x$JAVA_LIBRARY_PATH\" != \"x\" ]; then\n      YARN_OPTS=\"$YARN_OPTS -Djava.library.path=$JAVA_LIBRARY_PATH\"\n      fi\n      YARN_OPTS=\"$YARN_OPTS -Dyarn.policy.file=$YARN_POLICYFILE\"\n      YARN_OPTS=\"$YARN_OPTS -Djava.io.tmpdir={{hadoop_java_io_tmpdir}}\"\n      {% if rm_security_opts is defined %}\n      YARN_OPTS=\"{{rm_security_opts}} $YARN_OPTS\"\n      {% endif %}",
+          "content" : "\n      export HADOOP_YARN_HOME={{hadoop_yarn_home}}\n      export YARN_LOG_DIR={{yarn_log_dir_prefix}}/$USER\n      export YARN_PID_DIR={{yarn_pid_dir_prefix}}/$USER\n      export HADOOP_LIBEXEC_DIR={{hadoop_libexec_dir}}\n      export JAVA_HOME={{java64_home}}\n      export JAVA_LIBRARY_PATH=\"${JAVA_LIBRARY_PATH}:{{hadoop_java_io_tmpdir}}\"\n\n      # We need to add the EWMA appender for the yarn daemons only;\n      # however, YARN_ROOT_LOGGER is shared by the yarn client and the\n      # daemons. This is restrict the EWMA appender to daemons only.\n      INVOKER=\"${0##*/}\"\n      if [ \"$INVOKER\" == \"yarn-daemon.sh\" ]; then\n        export YARN_ROOT_LOGGER=${YARN_ROOT_LOGGER:-INFO,EWMA,RFA}\n      fi\n\n      # User for YARN daemons\n      export HADOOP_YARN_USER=${HADOOP_YARN_USER:-yarn}\n\n      # resolve links - $0 may be a softlink\n      export YARN_CONF_DIR=\"${YARN_CONF_DIR:-$HADOOP_YARN_HOME/conf}\"\n\n      # some Java parameters\n      # export JAVA_HOME=/home/y/libexec/jdk1.6.0/\n      if [ \"$JAVA_HOME\" != \"\" ]; then\n      #echo \"run java in $JAVA_HOME\"\n      JAVA_HOME=$JAVA_HOME\n      fi\n\n      if [ \"$JAVA_HOME\" = \"\" ]; then\n      echo \"Error: JAVA_HOME is not set.\"\n      exit 1\n      fi\n\n      JAVA=$JAVA_HOME/bin/java\n      JAVA_HEAP_MAX=-Xmx1000m\n\n      # For setting YARN specific HEAP sizes please use this\n      # Parameter and set appropriately\n      YARN_HEAPSIZE={{yarn_heapsize}}\n\n      # check envvars which might override default args\n      if [ \"$YARN_HEAPSIZE\" != \"\" ]; then\n      JAVA_HEAP_MAX=\"-Xmx\"\"$YARN_HEAPSIZE\"\"m\"\n      fi\n\n      # Resource Manager specific parameters\n\n      # Specify the max Heapsize for the ResourceManager using a numerical value\n      # in the scale of MB. For example, to specify an jvm option of -Xmx1000m, set\n      # the value to 1000.\n      # This value will be overridden by an Xmx setting specified in either YARN_OPTS\n      # and/or YARN_RESOURCEMANAGER_OPTS.\n      # If not specified, the default value will be picked from either YARN_HEAPMAX\n      # or JAVA_HEAP_MAX with YARN_HEAPMAX as the preferred option of the two.\n      export YARN_RESOURCEMANAGER_HEAPSIZE={{resourcemanager_heapsize}}\n\n      # Specify the JVM options to be used when starting the ResourceManager.\n      # These options will be appended to the options specified as YARN_OPTS\n      # and therefore may override any similar flags set in YARN_OPTS\n      #export YARN_RESOURCEMANAGER_OPTS=\n\n      # Node Manager specific parameters\n\n      # Specify the max Heapsize for the NodeManager using a numerical value\n      # in the scale of MB. For example, to specify an jvm option of -Xmx1000m, set\n      # the value to 1000.\n      # This value will be overridden by an Xmx setting specified in either YARN_OPTS\n      # and/or YARN_NODEMANAGER_OPTS.\n      # If not specified, the default value will be picked from either YARN_HEAPMAX\n      # or JAVA_HEAP_MAX with YARN_HEAPMAX as the preferred option of the two.\n      export YARN_NODEMANAGER_HEAPSIZE={{nodemanager_heapsize}}\n\n      # Specify the max Heapsize for the timeline server using a numerical value\n      # in the scale of MB. For example, to specify an jvm option of -Xmx1000m, set\n      # the value to 1024.\n      # This value will be overridden by an Xmx setting specified in either YARN_OPTS\n      # and/or YARN_TIMELINESERVER_OPTS.\n      # If not specified, the default value will be picked from either YARN_HEAPMAX\n      # or JAVA_HEAP_MAX with YARN_HEAPMAX as the preferred option of the two.\n      export YARN_TIMELINESERVER_HEAPSIZE={{apptimelineserver_heapsize}}\n\n      # Specify the JVM options to be used when starting the NodeManager.\n      # These options will be appended to the options specified as YARN_OPTS\n      # and therefore may override any similar flags set in YARN_OPTS\n      #export YARN_NODEMANAGER_OPTS=\n\n      # so that filenames w/ spaces are handled correctly in loops below\n      IFS=\n\n\n      # default log directory and file\n      if [ \"$YARN_LOG_DIR\" = \"\" ]; then\n      YARN_LOG_DIR=\"$HADOOP_YARN_HOME/logs\"\n      fi\n      if [ \"$YARN_LOGFILE\" = \"\" ]; then\n      YARN_LOGFILE='yarn.log'\n      fi\n\n      # default policy file for service-level authorization\n      if [ \"$YARN_POLICYFILE\" = \"\" ]; then\n      YARN_POLICYFILE=\"hadoop-policy.xml\"\n      fi\n\n      # restore ordinary behaviour\n      unset IFS\n\n\n      YARN_OPTS=\"$YARN_OPTS -Dhadoop.log.dir=$YARN_LOG_DIR\"\n      YARN_OPTS=\"$YARN_OPTS -Dyarn.log.dir=$YARN_LOG_DIR\"\n      YARN_OPTS=\"$YARN_OPTS -Dhadoop.log.file=$YARN_LOGFILE\"\n      YARN_OPTS=\"$YARN_OPTS -Dyarn.log.file=$YARN_LOGFILE\"\n      YARN_OPTS=\"$YARN_OPTS -Dyarn.home.dir=$YARN_COMMON_HOME\"\n      YARN_OPTS=\"$YARN_OPTS -Dyarn.id.str=$YARN_IDENT_STRING\"\n      YARN_OPTS=\"$YARN_OPTS -Dhadoop.root.logger=${YARN_ROOT_LOGGER:-INFO,console}\"\n      YARN_OPTS=\"$YARN_OPTS -Dyarn.root.logger=${YARN_ROOT_LOGGER:-INFO,console}\"\n      export YARN_NODEMANAGER_OPTS=\"$YARN_NODEMANAGER_OPTS -Dnm.audit.logger=INFO,NMAUDIT\"\n      export YARN_RESOURCEMANAGER_OPTS=\"$YARN_RESOURCEMANAGER_OPTS -Drm.audit.logger=INFO,RMAUDIT\"\n      if [ \"x$JAVA_LIBRARY_PATH\" != \"x\" ]; then\n      YARN_OPTS=\"$YARN_OPTS -Djava.library.path=$JAVA_LIBRARY_PATH\"\n      fi\n      YARN_OPTS=\"$YARN_OPTS -Dyarn.policy.file=$YARN_POLICYFILE\"\n      YARN_OPTS=\"$YARN_OPTS -Djava.io.tmpdir={{hadoop_java_io_tmpdir}}\"\n      {% if rm_security_opts is defined %}\n      YARN_OPTS=\"{{rm_security_opts}} $YARN_OPTS\"\n      {% endif %}",
           "is_supported_yarn_ranger" : "true",
           "service_check.queue.name" : "default",
           "resourcemanager_heapsize" : "1024",
@@ -1588,7 +1678,7 @@
           "hive.metastore.execute.setugi" : "true",
           "hive.tez.smb.number.waves" : "0.5",
           "hive.server2.authentication.spnego.keytab" : "HTTP/_HOST@EXAMPLE.COM",
-          "hive.zookeeper.quorum" : "%HOSTGROUP::host_group_1%:2181,%HOSTGROUP::host_group_3%:2181,%HOSTGROUP::host_group_2%:2181",
+          "hive.zookeeper.quorum" : "%HOSTGROUP::host_group_3%:2181,%HOSTGROUP::host_group_1%:2181,%HOSTGROUP::host_group_2%:2181",
           "hive.mapjoin.bucket.cache.size" : "10000",
           "hive.metastore.kerberos.principal" : "hive/_HOST@EXAMPLE.COM",
           "hive.tez.auto.reducer.parallelism" : "true",
@@ -1656,7 +1746,7 @@
           "hive.metastore.connect.retries" : "24",
           "hive.optimize.reducededuplication.min.reducer" : "4",
           "hive.tez.input.format" : "org.apache.hadoop.hive.ql.io.HiveInputFormat",
-          "hive.cluster.delegation.token.store.zookeeper.connectString" : "%HOSTGROUP::host_group_1%:2181,%HOSTGROUP::host_group_3%:2181,%HOSTGROUP::host_group_2%:2181",
+          "hive.cluster.delegation.token.store.zookeeper.connectString" : "%HOSTGROUP::host_group_3%:2181,%HOSTGROUP::host_group_1%:2181,%HOSTGROUP::host_group_2%:2181",
           "hive.metastore.uris" : "thrift://%HOSTGROUP::host_group_3%:9083",
           "hive.server2.max.start.attempts" : "5",
           "hive.exec.dynamic.partition.mode" : "strict",
@@ -1779,7 +1869,7 @@
       "webhcat-site" : {
         "properties_attributes" : { },
         "properties" : {
-          "templeton.zookeeper.hosts" : "%HOSTGROUP::host_group_1%:2181,%HOSTGROUP::host_group_3%:2181,%HOSTGROUP::host_group_2%:2181",
+          "templeton.zookeeper.hosts" : "%HOSTGROUP::host_group_3%:2181,%HOSTGROUP::host_group_1%:2181,%HOSTGROUP::host_group_2%:2181",
           "webhcat.proxyuser.root.groups" : "*",
           "webhcat.proxyuser.root.hosts" : "myhost-hdp-01",
           "templeton.hadoop.queue.name" : "default",
@@ -1812,7 +1902,7 @@
       "slider-env" : {
         "properties_attributes" : { },
         "properties" : {
-          "content" : "\n# Set Slider-specific environment variables here.\n\n# The only required environment variable is JAVA_HOME.  All others are\n# optional.  When running a distributed configuration it is best to\n# set JAVA_HOME in this file, so that it is correctly defined on\n# remote nodes.\n\n# The java implementation to use.  Required.\nexport JAVA_HOME={{java_home}}\n# The hadoop conf directory.  Optional as slider-client.xml can be edited to add properties.\nexport HADOOP_CONF_DIR={{hadoop_conf_dir}}"
+          "content" : "\n# Set Slider-specific environment variables here.\n\n# The only required environment variable is JAVA_HOME.  All others are\n# optional.  When running a distributed configuration it is best to\n# set JAVA_HOME in this file, so that it is correctly defined on\n# remote nodes.\n\n# The java implementation to use.  Required.\nexport JAVA_HOME={{java64_home}}\n# The hadoop conf directory.  Optional as slider-client.xml can be edited to add properties.\nexport HADOOP_CONF_DIR={{hadoop_conf_dir}}"
         }
       }
     },
@@ -1826,7 +1916,7 @@
           "hbase_master_heapsize" : "1024",
           "hbase_regionserver_xmn_ratio" : "0.2",
           "hbase_master_xmn_size" : "256",
-          "content" : "\n# Set environment variables here.\n\n# The java implementation to use. Java 1.6+ required.\nexport JAVA_HOME={{java_home}}\n\n# HBase Configuration directory\nexport HBASE_CONF_DIR=${HBASE_CONF_DIR:-{{hbase_conf_dir}}}\n\n# Extra Java CLASSPATH elements. Optional.\nadditional_cp={{hbase_classpath_additional}}\nif [  -n \"$additional_cp\" ];\nthen\n  export HBASE_CLASSPATH=${HBASE_CLASSPATH}:$additional_cp\nelse\n  export HBASE_CLASSPATH=${HBASE_CLASSPATH}\nfi\n\n# The maximum amount of heap to use for hbase shell.\nexport HBASE_SHELL_OPTS=\"-Xmx256m\"\n\n# Extra Java runtime options.\n# Below are what we set by default. May only work with SUN JVM.\n# For more on why as well as other possible settings,\n# see http://wiki.apache.org/hadoop/PerformanceTuning\nexport HBASE_OPTS=\"-XX:+UseConcMarkSweepGC -XX:ErrorFile={{hbase_log_dir}}/hs_err_pid%p.log -Djava.io.tmpdir={{hbase_tmp_dir}}\"\nexport SERVER_GC_OPTS=\"-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:{{hbase_log_dir}}/gc.log-`date +'%Y%m%d%H%M'`\"\n# Uncomment below to enable java garbage collection logging.\n# export HBASE_OPTS=\"$HBASE_OPTS -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:$HBASE_HOME/logs/gc-hbase.log\"\n\n# Uncomment and adjust to enable JMX exporting\n# See jmxremote.password and jmxremote.access in $JRE_HOME/lib/management to configure remote password access.\n# More details at: http://java.sun.com/javase/6/docs/technotes/guides/management/agent.html\n#\n# export HBASE_JMX_BASE=\"-Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false\"\n\n{% if java_version < 8 %}\nexport HBASE_MASTER_OPTS=\" -XX:PermSize=64m -XX:MaxPermSize={{hbase_master_maxperm_size}} -Xms{{hbase_heapsize}} -Xmx{{hbase_heapsize}} -Xmn{{hbase_master_xmn_size}} -XX:CMSInitiatingOccupancyFraction=70 -XX:+UseCMSInitiatingOccupancyOnly\"\nexport HBASE_REGIONSERVER_OPTS=\"-XX:MaxPermSize=128m -Xmn{{regionserver_xmn_size}} -XX:CMSInitiatingOccupancyFraction=70 -XX:+UseCMSInitiatingOccupancyOnly -Xms{{regionserver_heapsize}} -Xmx{{regionserver_heapsize}}\"\n{% else %}\nexport HBASE_MASTER_OPTS=\" -Xms{{hbase_heapsize}} -Xmx{{hbase_heapsize}} -Xmn{{hbase_master_xmn_size}} -XX:CMSInitiatingOccupancyFraction=70 -XX:+UseCMSInitiatingOccupancyOnly\"\nexport HBASE_REGIONSERVER_OPTS=\" -Xmn{{regionserver_xmn_size}} -XX:CMSInitiatingOccupancyFraction=70 -XX:+UseCMSInitiatingOccupancyOnly -Xms{{regionserver_heapsize}} -Xmx{{regionserver_heapsize}}\"\n{% endif %}\n\n\n# export HBASE_THRIFT_OPTS=\"$HBASE_JMX_BASE -Dcom.sun.management.jmxremote.port=10103\"\n# export HBASE_ZOOKEEPER_OPTS=\"$HBASE_JMX_BASE -Dcom.sun.management.jmxremote.port=10104\"\n\n# File naming hosts on which HRegionServers will run. $HBASE_HOME/conf/regionservers by default.\nexport HBASE_REGIONSERVERS=${HBASE_CONF_DIR}/regionservers\n\n# Extra ssh options. Empty by default.\n# export HBASE_SSH_OPTS=\"-o ConnectTimeout=1 -o SendEnv=HBASE_CONF_DIR\"\n\n# Where log files are stored. $HBASE_HOME/logs by default.\nexport HBASE_LOG_DIR={{hbase_log_dir}}\n\n# A string representing this instance of hbase. $USER by default.\n# export HBASE_IDENT_STRING=$USER\n\n# The scheduling priority for daemon processes. See 'man nice'.\n# export HBASE_NICENESS=10\n\n# The directory where pid files are stored. /tmp by default.\nexport HBASE_PID_DIR={{hbase_pid_dir}}\n\n# Seconds to sleep between slave commands. Unset by default. This\n# can be useful in large clusters, where, e.g., slave rsyncs can\n# otherwise arrive faster than the master can service them.\n# export HBASE_SLAVE_SLEEP=0.1\n\n# Tell HBase whether it should manage it's own instance of Zookeeper or not.\nexport HBASE_MANAGES_ZK=false\n\n{% if security_enabled %}\nexport HBASE_OPTS=\"$HBASE_OPTS -Djava.security.auth.login.config={{client_jaas_config_file}}\"\nexport HBASE_MASTER_OPTS=\"$HBASE_MASTER_OPTS -Djava.security.auth.login.config={{master_jaas_config_file}} -Djavax.security.auth.useSubjectCredsOnly=false\"\nexport HBASE_REGIONSERVER_OPTS=\"$HBASE_REGIONSERVER_OPTS -Djava.security.auth.login.config={{regionserver_jaas_config_file}} -Djavax.security.auth.useSubjectCredsOnly=false\"\nexport HBASE_ZOOKEEPER_OPTS=\"$HBASE_ZOOKEEPER_OPTS -Djava.security.auth.login.config={{ams_zookeeper_jaas_config_file}}\"\n{% endif %}\n\n# use embedded native libs\n_HADOOP_NATIVE_LIB=\"/usr/lib/ams-hbase/lib/hadoop-native/\"\nexport HBASE_OPTS=\"$HBASE_OPTS -Djava.library.path=${_HADOOP_NATIVE_LIB}\"\n\n# Unset HADOOP_HOME to avoid importing HADOOP installed cluster related configs like: /usr/hdp/2.2.0.0-2041/hadoop/conf/\nexport HADOOP_HOME={{ams_hbase_home_dir}}\n\n# Explicitly Setting HBASE_HOME for AMS HBase so that there is no conflict\nexport HBASE_HOME={{ams_hbase_home_dir}}",
+          "content" : "\n# Set environment variables here.\n\n# The java implementation to use. Java 1.6+ required.\nexport JAVA_HOME={{java64_home}}\n\n# HBase Configuration directory\nexport HBASE_CONF_DIR=${HBASE_CONF_DIR:-{{hbase_conf_dir}}}\n\n# Extra Java CLASSPATH elements. Optional.\nadditional_cp={{hbase_classpath_additional}}\nif [  -n \"$additional_cp\" ];\nthen\n  export HBASE_CLASSPATH=${HBASE_CLASSPATH}:$additional_cp\nelse\n  export HBASE_CLASSPATH=${HBASE_CLASSPATH}\nfi\n\n# The maximum amount of heap to use for hbase shell.\nexport HBASE_SHELL_OPTS=\"-Xmx256m\"\n\n# Extra Java runtime options.\n# Below are what we set by default. May only work with SUN JVM.\n# For more on why as well as other possible settings,\n# see http://wiki.apache.org/hadoop/PerformanceTuning\nexport HBASE_OPTS=\"-XX:+UseConcMarkSweepGC -XX:ErrorFile={{hbase_log_dir}}/hs_err_pid%p.log -Djava.io.tmpdir={{hbase_tmp_dir}}\"\nexport SERVER_GC_OPTS=\"-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:{{hbase_log_dir}}/gc.log-`date +'%Y%m%d%H%M'`\"\n# Uncomment below to enable java garbage collection logging.\n# export HBASE_OPTS=\"$HBASE_OPTS -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:$HBASE_HOME/logs/gc-hbase.log\"\n\n# Uncomment and adjust to enable JMX exporting\n# See jmxremote.password and jmxremote.access in $JRE_HOME/lib/management to configure remote password access.\n# More details at: http://java.sun.com/javase/6/docs/technotes/guides/management/agent.html\n#\n# export HBASE_JMX_BASE=\"-Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false\"\n\n{% if java_version < 8 %}\nexport HBASE_MASTER_OPTS=\" -XX:PermSize=64m -XX:MaxPermSize={{hbase_master_maxperm_size}} -Xms{{hbase_heapsize}} -Xmx{{hbase_heapsize}} -Xmn{{hbase_master_xmn_size}} -XX:CMSInitiatingOccupancyFraction=70 -XX:+UseCMSInitiatingOccupancyOnly\"\nexport HBASE_REGIONSERVER_OPTS=\"-XX:MaxPermSize=128m -Xmn{{regionserver_xmn_size}} -XX:CMSInitiatingOccupancyFraction=70 -XX:+UseCMSInitiatingOccupancyOnly -Xms{{regionserver_heapsize}} -Xmx{{regionserver_heapsize}}\"\n{% else %}\nexport HBASE_MASTER_OPTS=\" -Xms{{hbase_heapsize}} -Xmx{{hbase_heapsize}} -Xmn{{hbase_master_xmn_size}} -XX:CMSInitiatingOccupancyFraction=70 -XX:+UseCMSInitiatingOccupancyOnly\"\nexport HBASE_REGIONSERVER_OPTS=\" -Xmn{{regionserver_xmn_size}} -XX:CMSInitiatingOccupancyFraction=70 -XX:+UseCMSInitiatingOccupancyOnly -Xms{{regionserver_heapsize}} -Xmx{{regionserver_heapsize}}\"\n{% endif %}\n\n\n# export HBASE_THRIFT_OPTS=\"$HBASE_JMX_BASE -Dcom.sun.management.jmxremote.port=10103\"\n# export HBASE_ZOOKEEPER_OPTS=\"$HBASE_JMX_BASE -Dcom.sun.management.jmxremote.port=10104\"\n\n# File naming hosts on which HRegionServers will run. $HBASE_HOME/conf/regionservers by default.\nexport HBASE_REGIONSERVERS=${HBASE_CONF_DIR}/regionservers\n\n# Extra ssh options. Empty by default.\n# export HBASE_SSH_OPTS=\"-o ConnectTimeout=1 -o SendEnv=HBASE_CONF_DIR\"\n\n# Where log files are stored. $HBASE_HOME/logs by default.\nexport HBASE_LOG_DIR={{hbase_log_dir}}\n\n# A string representing this instance of hbase. $USER by default.\n# export HBASE_IDENT_STRING=$USER\n\n# The scheduling priority for daemon processes. See 'man nice'.\n# export HBASE_NICENESS=10\n\n# The directory where pid files are stored. /tmp by default.\nexport HBASE_PID_DIR={{hbase_pid_dir}}\n\n# Seconds to sleep between slave commands. Unset by default. This\n# can be useful in large clusters, where, e.g., slave rsyncs can\n# otherwise arrive faster than the master can service them.\n# export HBASE_SLAVE_SLEEP=0.1\n\n# Tell HBase whether it should manage it's own instance of Zookeeper or not.\nexport HBASE_MANAGES_ZK=false\n\n{% if security_enabled %}\nexport HBASE_OPTS=\"$HBASE_OPTS -Djava.security.auth.login.config={{client_jaas_config_file}}\"\nexport HBASE_MASTER_OPTS=\"$HBASE_MASTER_OPTS -Djava.security.auth.login.config={{master_jaas_config_file}} -Djavax.security.auth.useSubjectCredsOnly=false\"\nexport HBASE_REGIONSERVER_OPTS=\"$HBASE_REGIONSERVER_OPTS -Djava.security.auth.login.config={{regionserver_jaas_config_file}} -Djavax.security.auth.useSubjectCredsOnly=false\"\nexport HBASE_ZOOKEEPER_OPTS=\"$HBASE_ZOOKEEPER_OPTS -Djava.security.auth.login.config={{ams_zookeeper_jaas_config_file}}\"\n{% endif %}\n\n# use embedded native libs\n_HADOOP_NATIVE_LIB=\"/usr/lib/ams-hbase/lib/hadoop-native/\"\nexport HBASE_OPTS=\"$HBASE_OPTS -Djava.library.path=${_HADOOP_NATIVE_LIB}\"\n\n# Unset HADOOP_HOME to avoid importing HADOOP installed cluster related configs like: /usr/hdp/2.2.0.0-2041/hadoop/conf/\nexport HADOOP_HOME={{ams_hbase_home_dir}}\n\n# Explicitly Setting HBASE_HOME for AMS HBase so that there is no conflict\nexport HBASE_HOME={{ams_hbase_home_dir}}",
           "hbase_pid_dir" : "/var/run/ambari-metrics-collector/",
           "hbase_regionserver_shutdown_timeout" : "30",
           "hbase_log_dir" : "/var/log/ambari-metrics-collector",
@@ -1908,6 +1998,16 @@
       "ranger-hdfs-security" : {
         "properties_attributes" : { },
         "properties" : { }
+      }
+    },
+    {
+      "spark-logsearch-conf" : {
+        "properties_attributes" : { },
+        "properties" : {
+          "component_mappings" : "SPARK_JOBHISTORYSERVER:spark_jobhistory_server;SPARK_THRIFTSERVER:spark_thriftserver;LIVY_SERVER:livy_server",
+          "content" : "\n{\n   \"input\":[\n      {\n       \"type\":\"spark_jobhistory_server\",\n       \"rowtype\":\"service\",\n       \"path\":\"{{default('/configurations/spark-env/spark_log_dir', '/var/log/spark')}}/spark-*-org.apache.spark.deploy.history.HistoryServer*.out\"\n     },\n     {\n       \"type\":\"spark_thriftserver\",\n       \"rowtype\":\"service\",\n       \"path\":\"{{default('/configurations/spark-env/spark_log_dir', '/var/log/spark')}}/spark-*-org.apache.spark.sql.hive.thriftserver.HiveThriftServer2*.out\"\n     },\n     {\n       \"type\":\"livy_server\",\n       \"rowtype\":\"service\",\n       \"path\":\"{{default('/configurations/livy-env/livy_log_dir', '/var/log/livy')}}/livy-livy-server.out\"\n     }\n   ],\n   \"filter\":[\n       {\n          \"filter\":\"grok\",\n          \"conditions\":{\n            \"fields\":{\n              \"type\":[\n                \"spark_jobhistory_server\",\n                \"spark_thriftserver\",\n                \"livy_server\"\n              ]\n             }\n          },\n          \"log4j_format\":\"\",\n          \"multiline_pattern\":\"^(%{SPARK_DATESTAMP:logtime}%{SPACE}%{LOGLEVEL:level})\",\n          \"message_pattern\":\"(?m)^%{SPARK_DATESTAMP:logtime}%{SPACE}%{LOGLEVEL:level}%{SPACE}%{JAVAFILE:file}:%{SPACE}%{GREEDYDATA:log_message}\",\n          \"post_map_values\":{\n            \"logtime\":{\n              \"map_date\":{\n                \"target_date_pattern\":\"yy/MM/dd HH:mm:ss\"\n              }\n             },\n            \"level\":{\n              \"map_fieldvalue\":{\n                \"pre_value\":\"WARNING\",\n                \"post_value\":\"WARN\"\n              }\n             }\n           }\n      }\n   ]\n}",
+          "service_name" : "Spark"
+        }
       }
     },
     {
@@ -2005,13 +2105,16 @@
           "name" : "HDFS_CLIENT"
         },
         {
+          "name" : "ZKFC"
+        },
+        {
           "name" : "SPARK2_CLIENT"
         },
         {
           "name" : "METRICS_MONITOR"
         },
         {
-          "name" : "NFS_GATEWAY"
+          "name" : "NAMENODE"
         },
         {
           "name" : "TEZ_CLIENT"
@@ -2024,9 +2127,6 @@
         },
         {
           "name" : "PIG"
-        },
-        {
-          "name" : "SECONDARY_NAMENODE"
         },
         {
           "name" : "HST_AGENT"
@@ -2044,7 +2144,13 @@
           "name" : "DATANODE"
         },
         {
+          "name" : "JOURNALNODE"
+        },
+        {
           "name" : "HIVE_CLIENT"
+        },
+        {
+          "name" : "RESOURCEMANAGER"
         }
       ],
       "configurations" : [ ],
@@ -2066,16 +2172,13 @@
           "name" : "HDFS_CLIENT"
         },
         {
-          "name" : "HST_SERVER"
+          "name" : "ZKFC"
         },
         {
           "name" : "SPARK2_CLIENT"
         },
         {
           "name" : "METRICS_MONITOR"
-        },
-        {
-          "name" : "NFS_GATEWAY"
         },
         {
           "name" : "NAMENODE"
@@ -2091,12 +2194,6 @@
         },
         {
           "name" : "PIG"
-        },
-        {
-          "name" : "ACTIVITY_ANALYZER"
-        },
-        {
-          "name" : "ACTIVITY_EXPLORER"
         },
         {
           "name" : "HST_AGENT"
@@ -2117,7 +2214,7 @@
           "name" : "DATANODE"
         },
         {
-          "name" : "APP_TIMELINE_SERVER"
+          "name" : "JOURNALNODE"
         },
         {
           "name" : "HIVE_CLIENT"
@@ -2149,9 +2246,6 @@
         },
         {
           "name" : "METRICS_MONITOR"
-        },
-        {
-          "name" : "NFS_GATEWAY"
         },
         {
           "name" : "TEZ_CLIENT"
@@ -2200,9 +2294,6 @@
           "name" : "METRICS_MONITOR"
         },
         {
-          "name" : "NFS_GATEWAY"
-        },
-        {
           "name" : "HIVE_METASTORE"
         },
         {
@@ -2221,6 +2312,9 @@
           "name" : "WEBHCAT_SERVER"
         },
         {
+          "name" : "ACTIVITY_ANALYZER"
+        },
+        {
           "name" : "HST_AGENT"
         },
         {
@@ -2228,6 +2322,9 @@
         },
         {
           "name" : "ZOOKEEPER_SERVER"
+        },
+        {
+          "name" : "JOURNALNODE"
         },
         {
           "name" : "METRICS_COLLECTOR"
@@ -2245,10 +2342,16 @@
           "name" : "HDFS_CLIENT"
         },
         {
+          "name" : "HST_SERVER"
+        },
+        {
           "name" : "HISTORYSERVER"
         },
         {
           "name" : "PIG"
+        },
+        {
+          "name" : "ACTIVITY_EXPLORER"
         },
         {
           "name" : "MAPREDUCE2_CLIENT"
@@ -2258,6 +2361,9 @@
         },
         {
           "name" : "SPARK_JOBHISTORYSERVER"
+        },
+        {
+          "name" : "APP_TIMELINE_SERVER"
         },
         {
           "name" : "HIVE_CLIENT"
