@@ -1,0 +1,21 @@
+---
+
+#- debug:
+#    msg: "XXXX {{ hostvars[item].public_ip }} {{ hostvars[item]['ansible_nodename'] }}"
+#    msg: "XXXX {{ item }}"
+#  delegate_to: localhost
+#  run_once: true
+#  with_items:
+#    - "{{ groups['all'] }}"
+
+- name: Add mappings to /etc/hosts
+  lineinfile:
+    dest: /etc/hosts
+    line: "{{ hostvars[item].public_ip }} {{ hostvars[item]['ansible_nodename'] }}"
+    regexp: "{{ hostvars[item]['ansible_nodename'] }}$"
+    state: present
+  delegate_to: localhost
+  run_once: true
+  with_items:
+    - "{{ groups['all'] }}"
+  

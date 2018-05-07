@@ -49,6 +49,10 @@ Note : due to the ansible bug below (we must wait for the next release), Network
 
 `ansible-playbook -c localhost ansible/playbooks/site.yml -e azure_clean=True`
 
+- to update the local file /etc/hosts with the public ip of the started VM(after each restart the VM are allocated new public IP) :
+
+`ansible-playbook -c localhost ansible/playbooks/build_cluster.yml --tags update-local-hosts`
+
 # DEPLOY AN HDP CLUSTER
 
 - Test connectivity           : 
@@ -65,9 +69,9 @@ Note : due to the ansible bug below (we must wait for the next release), Network
 
 - Launch the cluster creation via blueprint: 
 
-`ansible-playbook -i ansible/inventories/azure_rm.py ansible/playbooks/site.yml --tags blueprints`
+`ansible-playbook -i ansible/inventories/azure_rm.py ansible/playbooks/local-hosts.yml`
 
-Ambari UI   : http://<ambari-host-external-ip>:8080/ 
+Ambari UI   : http://myhost-hdp-01:8080/ 
 
 # VAGRANT (Deprecated see the azure part instead)
 launch :

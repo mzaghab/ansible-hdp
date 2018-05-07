@@ -1,0 +1,5 @@
+---
+- hosts: hdp
+  become: true
+  roles:
+    - {role: hosts , tags: [hosts]}
