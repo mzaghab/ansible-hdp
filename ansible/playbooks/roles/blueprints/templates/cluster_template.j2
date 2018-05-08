@@ -20,22 +20,35 @@
     "type" : "KERBEROS"
   },
 {% endif %}
+
 "host_groups" :[
-  {% for node_group in groups if node_group not in ['all', 'ambari-server', 'hdp', 'ungrouped'] and groups[node_group]|length > 0 -%}
-
   {
-    "name" : "{{ node_group }}",
+    "name" : "host_group_1",
     "hosts" : [
-      {% for node in groups[node_group]|sort -%}
-
-      { "fqdn" : "{{ hostvars[node]['ansible_fqdn'] | lower }}" }{% if not loop.last %},{% endif %}
-
-      {% endfor %}
-
+      { "fqdn" : "myhost-hdp-01" }
     ]
-  }{% if not loop.last %},{% endif %}
-
-  {% endfor %}
-
+  },
+  {
+    "name" : "host_group_2",
+    "hosts" : [
+      { "fqdn" : "myhost-hdp-02" }
+    ]
+  },
+  
+  {
+    "name" : "host_group_3",
+    "hosts" : [
+      { "fqdn" : "myhost-hdp-03" }
+    ]
+  },
+  
+  {
+    "name" : "host_group_4",
+    "hosts" : [
+      { "fqdn" : "myhost-hdp-04" }
+      { "fqdn" : "myhost-hdp-05" }
+    ]
+  },
+  
 ]
 }
