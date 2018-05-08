@@ -3,6 +3,8 @@
 - name: Create the hive databases
   mysql_db:
     name: "{{ hive_db_name }}"
+    login_user: root
+    login_host: "localhost"
     state: present
   run_once: true
   delegate_to: "{{ groups['mariadb'][0]}}"
