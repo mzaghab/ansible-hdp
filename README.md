@@ -69,7 +69,7 @@ Note : due to the ansible bug below (we must wait for the next release), Network
 
 - Launch the cluster creation via blueprint: 
 
-`ansible-playbook -i ansible/inventories/azure_rm.py ansible/playbooks/local-hosts.yml`
+`ansible-playbook -i ansible/inventories/azure_rm.py  ansible/playbooks/local-hosts.yml --tags hosts`
 
 Ambari UI   : http://myhost-hdp-01:8080/ 
 
