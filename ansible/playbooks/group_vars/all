@@ -96,7 +96,9 @@ hive2_log_maxbackupindex: 30
 hive2_log_maxfilesize: 256
 webhcat_log_maxfilesize: 256
 webhcat_log_maxbackupindex: 20
-
+hive_db_name: "hive"
+hive_db_user: "hive"
+hive_db_password: "mounir"
 has_ganglia_server: false
 ###################### HIVE ######################
 hive_log_level: INFO

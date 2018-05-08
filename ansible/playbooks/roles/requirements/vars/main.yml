@@ -7,3 +7,4 @@ list_yum_pkg:
     - python-devel
     - python-pip
     - mysql-connector-java
+    - MySQL-python

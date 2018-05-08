@@ -1,0 +1,20 @@
+---
+
+- name: Create the hive databases
+  mysql_db:
+    name: "{{ hive_db_name }}"
+    state: present
+  run_once: true
+  delegate_to: "{{ groups['mariadb'][0]}}"
+
+- name: Create the hive databases user and grants
+  mysql_user:
+    name: "{{ hive_db_user }}"
+    password: "{{ hive_db_password }}"
+    login_user: root
+    login_host: "localhost"
+    host: "{{ groups['mariadb'][0] }}"
+    priv: '*.*:ALL'
+    state: present
+  run_once: true
+  delegate_to: "{{ groups['mariadb'][0] }}"

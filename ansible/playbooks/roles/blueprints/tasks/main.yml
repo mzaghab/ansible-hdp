@@ -1,2 +1,6 @@
 ---
+- include: create-databases.yml
+  tags: create-databases
+
 - include: deploy.yml
+
