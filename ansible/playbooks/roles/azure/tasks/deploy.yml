@@ -28,19 +28,20 @@
   azure_rm_securitygroup:
     resource_group: "{{ azure_resource_group }}"
     name: "{{ azure_security_group }}"
+
+- name: Define security rules that allows Inboud traffic on some port "{{ azure_security_group }}"
+  azure_rm_securitygroup:
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ azure_security_group }}"
     rules:
-      - name: SSH
+      - name: "PORT_{{ item.port }}"
         protocol: Tcp
-        destination_port_range: 22
+        destination_port_range: "{{ item.port }}"
+        priority: "{{ item.priority }}"
         access: Allow
-        priority: 101
         direction: Inbound
-      - name: HTTP_8080
-        protocol: Tcp
-        destination_port_range: 8080
-        access: Allow
-        priority: 102
-        direction: Inbound
+  with_items: "{{ azure_security_group_rules }}"
+  tags: test
 
 - name: Create Network Interfaces
   azure_rm_networkinterface:

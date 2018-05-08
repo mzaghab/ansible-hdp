@@ -13,6 +13,9 @@ azure_virtual_network: "my-virtual-network-hdp"
 azure_virtual_interface: "my-virtual-interface-hdp"
 azure_subnet: "my-subnet-hdp"
 azure_security_group: "my-security-group-hdp"
+azure_security_group_rules:
+  - {port: 22, priority: 101}
+  - {port: 8080, priority: 102}
 azure_network_address_prefixes: "10.0.0.0/24"
 azure_vm_image:
   {   offer: "CentOS",

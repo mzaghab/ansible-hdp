@@ -1,12 +1,6 @@
 # Author : Mounir ZAGHAB
 # Date : 31/07/2016 
 
-- add port to security group easily(port HDFS ...)
-
-- create hive database and user : 
-    CREATE DATABASE hive /*!40100 DEFAULT CHARACTER SET utf8 */;
-    CREATE USER 'hive'@'myhost-hdp-03' IDENTIFIED BY 'mounir';
-    GRANT ALL PRIVILEGES ON *.* TO 'hive'@'myhost-hdp-03';
 
 - https://github.com/hortonworks/ansible-hortonworks
 - kerberos role : uncomment "Launch Propagation kdc database on slave" task
