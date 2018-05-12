@@ -1,7 +1,7 @@
 ---
 #############    COMMON     ###########################
 internal_repo: http://public-repo-1.hortonworks.com
-jdk: java-1.8.0-openjdk-devel-1.8.0.161
+jdk: java-1.8.0-openjdk-devel-1.8.0.171
 java_home: /usr/lib/jvm/java
 mysql_connector_java: /usr/share/java/mysql-connector-java.jar
 major_stack_version: 2
@@ -99,31 +99,31 @@ webhcat_log_maxbackupindex: 20
 hive_db_name: "hive"
 hive_db_user: "hive"
 hive_db_password: "mounir"
-has_ganglia_server: false
+#has_ganglia_server: false
 ###################### HIVE ######################
-hive_log_level: INFO
-hive_log_maxbackupindex: 30
-hive_log_maxfilesize: 256
-hive_kerberos_keytab: "hive_kerberos_keytab_todo"
-tez_config_dir: "tez_config_dir_todo"
+#hive_log_level: INFO
+#hive_log_maxbackupindex: 30
+#hive_log_maxfilesize: 256
+#hive_kerberos_keytab: "hive_kerberos_keytab_todo"
+#tez_config_dir: "tez_config_dir_todo"
 
 ###################### SPARK ######################
-spark_home: "spark_home_todo"
-spark_log_dir: "/var/log/spark"
-spark_pid_dir: "/var/run/spark"
-spark_daemon_memory: 1024
-spark_conf: "/etc/spark/conf"
-spark_hadoop_lib_native: "spark_hadoop_lib_native"
-spark_history_dir: "/var/log/spark-history"
-spark_history_server_host: "spark_history_server_host"
-spark_history_ui_port: "spark_history_ui_port"
+#spark_home: "spark_home_todo"
+#spark_log_dir: "/var/log/spark"
+#spark_pid_dir: "/var/run/spark"
+#spark_daemon_memory: 1024
+#spark_conf: "/etc/spark/conf"
+#spark_hadoop_lib_native: "spark_hadoop_lib_native"
+#spark_history_dir: "/var/log/spark-history"
+#spark_history_server_host: "spark_history_server_host"
+#spark_history_ui_port: "spark_history_ui_port"
 ###################### LIVY ######################
-livy_log_dir: "/var/log/livy"
-livy_pid_dir: "/var/run/livy"
-livy2_log_dir: "/var/log/livy2"
-livy2_pid_dir: "/var/run/livy2"
+#livy_log_dir: "/var/log/livy"
+#livy_pid_dir: "/var/run/livy"
+#livy2_log_dir: "/var/log/livy2"
+#livy2_pid_dir: "/var/run/livy2"
 ###################### HBASE ######################
-hbase_pid_dir: "hbase_pid_dir_todo"
+#hbase_pid_dir: "hbase_pid_dir_todo"
 ams_hbase_init_check_enabled: false
 
 ganglia_server_host: "ganglia_server_host"
