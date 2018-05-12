@@ -16,6 +16,10 @@ azure_security_group: "my-security-group-hdp"
 azure_security_group_rules:
   - {port: 22, priority: 101}
   - {port: 8080, priority: 102}
+  - {port: 3000, priority: 103}
+  - {port: 50070, priority: 104}
+  - {port: 8088, priority: 105}
+  
 azure_network_address_prefixes: "10.0.0.0/24"
 azure_vm_image:
   {   offer: "CentOS",
