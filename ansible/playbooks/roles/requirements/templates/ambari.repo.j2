@@ -1,8 +1,8 @@
-#VERSION_NUMBER=2.6.1.5-3
-[ambari-2.6.1.5]
-name=ambari Version - ambari-2.6.1.5
-baseurl={{ internal_repo }}/ambari/centos6/2.x/updates/2.6.1.5
+#VERSION_NUMBER={{ ambari.version }}
+[ambari-{{ ambari.version }}]
+name=ambari Version - ambari-{{ ambari.version }}
+baseurl={{ internal_repo }}/ambari/centos6/2.x/updates/{{ ambari.version }}
 gpgcheck=1
-gpgkey={{ internal_repo }}/ambari/centos6/2.x/updates/2.6.1.5/RPM-GPG-KEY/RPM-GPG-KEY-Jenkins
+gpgkey={{ internal_repo }}/ambari/centos6/2.x/updates/{{ ambari.version }}/RPM-GPG-KEY/RPM-GPG-KEY-Jenkins
 enabled=1
 priority=1
