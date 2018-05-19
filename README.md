@@ -71,7 +71,7 @@ Note : due to the ansible bug below (we must wait for the next release), Network
 
 `ansible-playbook -i ansible/inventories/azure_rm.py ansible/playbooks/site.yml --tags blueprints`
 
-Ambari UI   : http://<ambari-host-external-ip>:8080/ 
+Ambari UI   : http://myhost-hdp-01:8080/ 
 
 # VAGRANT (Deprecated see the azure part instead)
 launch :
