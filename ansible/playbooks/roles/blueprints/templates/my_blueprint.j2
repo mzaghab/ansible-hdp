@@ -1899,7 +1899,7 @@
           "hive.server2.tez.sessions.per.default.queue" : "1",
           "hive.server2.thrift.http.port" : "10001",
           "hive.server2.logging.operation.log.location" : "/tmp/hive/operation_logs",
-          "javax.jdo.option.ConnectionURL" : "jdbc:mysql://%HOSTGROUP::host_group_3%/hive",
+          "javax.jdo.option.ConnectionURL" : "jdbc:mysql://{{ambari_db.host}}:{{ambari_db.port}}/hive",
           "hive.map.aggr.hash.min.reduction" : "0.5",
           "hive.merge.size.per.task" : "256000000",
           "hive.merge.smallfiles.avgsize" : "16000000",
