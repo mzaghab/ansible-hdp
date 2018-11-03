@@ -9,6 +9,18 @@ Hortonworks docs :
 install ambari:
 - https://docs.hortonworks.com/HDPDocuments/Ambari-2.6.1.5/bk_ambari-installation/content/ch_Getting_Ready.html
 
+# BUILD THE INFRA CLUSTER (ON GOOGLE CLOUD)
+- export the google service account : 
+
+`export GCE_EMAIL=XXXXXX`
+
+`export GCE_PROJECT=XXXXXXX`
+
+`export GCE_CREDENTIALS_FILE_PATH=xxxxxxxxx`
+
+- Test connectivity           : 
+
+`ansible -i ansible/inventories/gce.py  -m ping all`
 
 # BUILD THE INFRA CLUSTER (ON AZURE CLOUD)
 
@@ -53,25 +65,9 @@ Note : due to the ansible bug below (we must wait for the next release), Network
 
 `ansible-playbook -i ansible/inventories/azure_rm.py  ansible/playbooks/local-hosts.yml --tags hosts`
 
-# DEPLOY AN HDP CLUSTER
-
 - Test connectivity           : 
 
 `ansible -i ansible/inventories/azure_rm.py  -m ping all`
-
-- Install init                : 
-
-`ansible-playbook -i ansible/inventories/azure_rm.py ansible/playbooks/site.yml  --become --tags init`
-
-- Install ambari server and agent: 
-
-`ansible-playbook -i ansible/inventories/azure_rm.py ansible/playbooks/site.yml --become --tags ambari`
-
-- Launch the cluster creation via blueprint: 
-
-`ansible-playbook -i ansible/inventories/azure_rm.py ansible/playbooks/site.yml --tags blueprints`
-
-Ambari UI   : http://myhost-hdp-01:8080/ 
 
 # VAGRANT (Deprecated see the azure part instead)
 launch :
@@ -86,6 +82,22 @@ Install ambari server /agent: ansible-playbook -i ../ansible/inventories/vagrant
 Ambari UI   : http://192.168.162.101:8080/ 
     
 ssh connect : vagrant ssh vag-hdp001
+
+# DEPLOY AN HDP CLUSTER
+
+- Install init                : 
+
+`ansible-playbook -i ansible/inventories/<inventory_cloud>.py ansible/playbooks/site.yml  --become --tags init`
+
+- Install ambari server and agent: 
+
+`ansible-playbook -i ansible/inventories/<inventory_cloud>.py ansible/playbooks/site.yml --become --tags ambari`
+
+- Launch the cluster creation via blueprint: 
+
+`ansible-playbook -i ansible/inventories/<inventory_cloud>.py ansible/playbooks/site.yml --tags blueprints`
+
+Ambari UI   : http://myhost-hdp-01:8080/ 
 
 Blueprint cluster creation : 
 ----
